@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+	<ItemGroup>
+		<Compile Remove="scratch\**" />
+		<EmbeddedResource Remove="scratch\**" />
+		<None Remove="scratch\**" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="CommandLineParser" Version="2.8.0" />
+		<PackageReference Include="FluentAssertions" Version="6.4.0" />
+		<PackageReference Include="Microsoft.Web.Administration" Version="11.1.0">
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="Newtonsoft.Json" Version="12.0.1">
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="Sharprompt" Version="2.4.0" />
+	</ItemGroup>
+	<ItemGroup>
+		<Content Include="lib\**">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="Program.cs.bak" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\IISLogManager.Core\IISLogManager.Core.csproj" />
+	</ItemGroup>
+</Project>

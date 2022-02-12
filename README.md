@@ -10,7 +10,10 @@ Libraries associated with IISLogManager are built to target `.NET Standard 2.0.X
 
 ## Core
 
-The Core library is free and open source, and may be paired with any ingestion solution. This library facilitates importing and parsing IIS log files. The default output of the parser is `List<IISLogObject>`.
+The Core library is the backbone of this project, and may be paired with any ingestion solution. 
+This library facilitates importing and parsing IIS log files. The default output of the parser is `List<IISLogObject>`. 
+The end goal is for this to support numerous forms of output. At the time of this update, it currently only supports 
+output to **JSON**.
 
 ## Usage
 
