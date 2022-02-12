@@ -15,6 +15,13 @@ This library facilitates importing and parsing IIS log files. The default output
 The end goal is for this to support numerous forms of output. At the time of this update, it currently only supports 
 output to **JSON**.
 
+## CLI
+
+The CLI is being developed using the dotnet 6.0.x sdk. When releases are made available I will try to make them self-contained, 
+but they may contain the runtimes as side-by-side libraries. The interactive parts of the CLI are written using an ANSI library, 
+and thus as of this time, do not work properly on older systems (Server 2012 R2 or older). For more information on this, check 
+out this MS DevBlog. [24 Bit Color in Windows Consoles](https://devblogs.microsoft.com/commandline/24-bit-color-in-the-windows-console/)
+
 ## Usage
 
 > **Note**: This section is under construction. As this readme was adapted from a previous iteration of this project, this may be out of date. It will likely be moved to it's own directory with other documentation at a later time.
