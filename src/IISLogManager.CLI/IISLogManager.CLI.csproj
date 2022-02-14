@@ -5,6 +5,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<NeutralLanguage>en-US</NeutralLanguage>
 	</PropertyGroup>
 	<ItemGroup>
 		<Compile Remove="scratch\**" />
@@ -12,6 +13,9 @@
 		<None Remove="scratch\**" />
 	</ItemGroup>
 	<ItemGroup>
+		<!-- 
+			The redundant Packages (multiple versions) are here because without specifying each of them the package fails to work properly on certain older systems 
+		-->
 		<PackageReference Include="CommandLineParser" Version="2.8.0" />
 		<PackageReference Include="FluentAssertions" Version="6.4.0" />
 		<PackageReference Include="Microsoft.Web.Administration" Version="11.1.0">
@@ -23,6 +27,7 @@
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 		<PackageReference Include="Sharprompt" Version="2.4.0" />
+		<PackageReference Include="Spectre.Console" Version="0.43.1-preview.0.24" />
 	</ItemGroup>
 	<ItemGroup>
 		<Content Include="lib\**">
@@ -30,9 +35,9 @@
 		</Content>
 	</ItemGroup>
 	<ItemGroup>
-	  <None Remove="Program.cs.bak" />
+		<None Remove="Program.cs.bak" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\IISLogManager.Core\IISLogManager.Core.csproj" />
+		<ProjectReference Include="..\IISLogManager.Core\IISLogManager.Core.csproj" />
 	</ItemGroup>
 </Project>

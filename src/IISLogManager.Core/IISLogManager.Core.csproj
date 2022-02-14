@@ -12,6 +12,9 @@
 		<None Remove="scratch\**" />
 	</ItemGroup>
 	<ItemGroup>
+		<!-- 
+			The various NewtonSoft Packages are here because without specifying each of them the package fails to work properly on certain older systems 
+		-->
 		<PackageReference Include="Newtonsoft.Json" Version="12.0.1">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>

@@ -1,142 +1,137 @@
-﻿using System.Diagnostics;
-using System.Text;
+﻿using System.Diagnostics.CodeAnalysis;
+using Spectre.Console;
+using Spectre.Console.Cli;
 using IISLogManager.Core;
-using Microsoft.Web.Administration;
-using System.Threading.Tasks;
-using Sharprompt;
-using System.Collections.Concurrent;
-using FluentAssertions.Common;
-using IISLogManager.Cli;
 
-namespace IISLogManager.Cli {
+namespace IISLogManager.CLI;
 
-    static class Program {
+/// <summary>
+/// Working on creating the program but with cmd line args added
+/// </summary>
+public class Program {
+	public static int Main(string[] args) {
+		var app = new CommandApp<GetIISLogsCommand>();
+		app.Configure(config => {
+			config.Settings.ApplicationName = "IISLogManager";
+			//TODO: Explore
+			// config.AddBranch();
+			//TODO: For old systems
+			// config.Settings.Console.Profile.Capabilities.Legacy
+		});
+		return app.Run(args);
+	}
 
-        private static IISController IISController = new();
-        private static readonly ServerManager ServerManager = new IISController().ServerManager;
-        private static readonly SiteObjectFactory ObjectFactory = new();
-        //TODO: Client FileWriter
+	private sealed class GetIISLogsCommand : Command<Settings> {
+		//TODO: Remove if moving out of file does not break it
+		// public class Settings : CommandSettings {
+		// 	[Description("Interactive Mode.\t\t[red]NOTE [/]:\tDISABLES ALL OTHER COMMAND LINE OPTIONS")]
+		// 	[DefaultValue(false)]
+		// 	[CommandOption("-i|--interactive")]
+		// 	public bool Interactive { get; init; }
+		//
+		//
+		// 	[Description("Run Mode.\t\t\t[blue]All[/] sites / [blue]Target[/] sites")]
+		// 	[CommandOption("-r|--runmode")]
+		// 	[DefaultValue(CLI.RunMode.All)]
+		// 	public RunMode? RunMode { get; init; }
+		//
+		// 	[Description("[DarkOrange](-r Target)[/]\t\tSite [yellow]Names[/]")]
+		// 	[CommandOption("-s|--sites")]
+		// 	public string[]? SiteNames { get; set; }
+		//
+		// 	[Description("[DarkOrange](-r Target)[/]\t\tSite [yellow]Urls[/]")]
+		// 	[CommandOption("-S|--Sites")]
+		// 	public string[]? SiteUrls { get; set; }
+		//
+		// 	[Description("Output Mode.\t\t[blue]Local[/] disk / [blue]Remote[/] endpoint")]
+		// 	[CommandOption("-O|--OutputMode")]
+		// 	[DefaultValue(CLI.OutputMode.Local)]
+		// 	public OutputMode? OutputMode { get; init; }
+		//
+		// 	[Description("[DarkOrange](-O Local)[/]")]
+		// 	[CommandOption("-o|--OutputDirectory")]
+		// 	public string? OutputDirectory { get; set; }
+		//
+		// 	[Description($"[DarkOrange](-O Remote)[/]")]
+		// 	[CommandOption("-u|--Uri")]
+		// 	[DefaultValue("localhost:45352")]
+		// 	public string? Uri { get; init; }
+		//
+		//
+		// 	public override ValidationResult Validate() {
+		// 		//TODO: Add ParameterSet validation
+		// 		if ( string.IsNullOrWhiteSpace(OutputDirectory) &&  OutputMode ==  CLI.OutputMode.Local ) {
+		// 			var userProfilePath = Environment.GetEnvironmentVariable("USERPROFILE");
+		// 			OutputDirectory = $"{userProfilePath}\\IISLogManager\\{DateTime.Now.ToString("yyyy-MM-dd")}";
+		// 		}
+		//
+		// 		return ValidationResult.Success();
+		// 	}
+		// }
 
-        static void Main(string[] args) {
-            var siteNameList = new List<string>();
-            IEnumerable<string>? sites;
-            string? exportLocation;
-            foreach (Site site in ServerManager.Sites) {
-                siteNameList.Add(site.Name);
-            }
 
-            Debug.WriteLine("IIS website count : " + siteNameList.Count);
-            sites = RunModeSelectPrompt(siteNameList).ToList();
+		public override int Execute([NotNull] CommandContext context, [NotNull] Settings settings) {
+			IISController iisController = new();
+			SiteObjectFactory siteObjectFactory = new();
+			var runMode = settings.RunMode;
+			var outputMode = settings.OutputMode;
+			var outputDirectory = settings.OutputDirectory;
+			// var sitesList = iisController.ServerManager.Sites.ToList();
+			var siteChoices = new List<string>();
+			iisController.ServerManager.Sites.ToList().ForEach((s) => {
+				iisController.Sites.Add(siteObjectFactory.BuildSite(s));
+			});
+			// var siteUrlList = new List<string>();
+			foreach (SiteObject site in iisController.Sites) {
+				var siteString = string.Format("{0}\t({1})", site.SiteName, site.SiteUrl);
+				siteChoices.Add(siteString);
+			}
 
-            exportLocation = RunExportLocationPrompt();
+			if ( settings.GetSites?.ToLower() == @"getsites" ) {
+				AnsiConsole.MarkupLine("[DarkOrange]Site Name[/]\t([Blue]Site Url[/])");
+				siteChoices.ForEach((s) => { AnsiConsole.MarkupLine($"{s}"); });
+				return 0;
+			}
+
+			var runModePrompt = new SelectionPrompt<RunMode>()
+				.Title("Do you want to get [green] All [/] sites, or [green]Target (specific)[/] sites?")
+				.PageSize(3)
+				.AddChoices(RunMode.All, RunMode.Target);
+			var siteSelectPrompt = new MultiSelectionPrompt<string>()
+				.Title("Choose sites to process : ")
+				.PageSize(10)
+				.InstructionsText(
+					"[grey](Press [blue]<space>[/] to toggle a site, " +
+					"[green]<enter>[/] to accept choices)[/]")
+				.MoreChoicesText("[grey](Move up and down to reveal more sites)[/]")
+				.AddChoices(siteChoices);
+			if ( settings.Interactive ) {
+				runMode = AnsiConsole.Prompt(runModePrompt);
+				if ( runMode == RunMode.Target ) {
+					AnsiConsole.Prompt(siteSelectPrompt);
+				}
+			}
 
 
-            int siteCount = sites.Count();
-            Debug.WriteLine($"Converting {siteCount} sites from <Site> to <SiteObject>...");
-            foreach (var site in sites) {
-                var websites = ServerManager.Sites.Where(s => s.Name == site);
-                var siteObject = ObjectFactory.BuildSite(websites.First());
-                IISController.Sites.Add(siteObject);
-            }
-            Debug.WriteLine($"Finished converting {siteCount} sites from <Site> to <SiteObject>...");
-            // Prompt: Choose output directory
-            //exportLocation = RunExportLocationPrompt();
-            Directory.CreateDirectory(exportLocation);
-            foreach (var site in IISController.Sites) {
-                Console.WriteLine("Parsing Logs for " + site.SiteName + "...");
-                //TODO: SiteObjectCollection
-                site.ParseAllLogs();
-                GC.Collect();
-                Console.WriteLine($"Finished parsing {site.Logs.Count} logs for {site.SiteName}!");
-            }
-            GC.Collect();
-            experimentalWriteJsonLogsToFile(exportLocation);
-        }
+			AnsiConsole.MarkupLine($"[DarkOrange]Run mode[/]: {runMode}");
+			AnsiConsole.MarkupLine($"[DarkOrange]Output Mode[/] : {outputMode}");
+			AnsiConsole.MarkupLine($"[DarkOrange]Output Directory[/] : {outputDirectory}");
+			// var searchOptions = new EnumerationOptions {
+			// 	AttributesToSkip = settings.IncludeHidden
+			// 		? FileAttributes.Hidden | FileAttributes.System
+			// 		: FileAttributes.System
+			// };
 
-        static void WriteJsonLogsToFile(string exportLocation) {
-            string consoleOut;
-            // TODO: Parallelize site processing, but not logs (for now)
-            foreach (var site in IISController.Sites) {
-                List<string> jsonLogs = new();
-                var safeSiteName = Utils.MakeSafeFilename(site.SiteName, '-');
-                var siteFile = string.Join("\\", exportLocation, safeSiteName) ??
-                               throw new ArgumentNullException("args");
-                var activeSiteFile = File.CreateText(siteFile);
-                int i = 0;
-                int x = site.Logs.Count;
-                foreach (var log in site.Logs.ToList()) {
-                    jsonLogs.Add(log.ToJson());
-                    site.Logs.Remove(log);
-                    consoleOut = $"Processing {i}\\{x - 1}...\r";
-                    Console.Write(consoleOut);
-                    i++;
-                }
-                Console.WriteLine($"Finished Processing {x} Logs!");
-                //File.WriteAllLinesAsync(siteFile, jsonLogs).Wait();
-                GC.Collect();
-            }
-            GC.Collect();
-        }
-        static void experimentalWriteJsonLogsToFile(string exportLocation) {
-            // TODO: Parallelize site processing, but not logs (for now)
-            foreach (var site in IISController.Sites) {
-                var safeSiteName = Utils.MakeSafeFilename(site.SiteName, '-');
-                var siteFile = string.Join("\\", exportLocation, safeSiteName) ??
-                               throw new ArgumentNullException("args");
-                var activeSiteFile = File.CreateText(siteFile);
-                Console.WriteLine($"Processing {site.Logs.Count} Logs!");
-                site.Logs.OutFile(siteFile);
-                Console.WriteLine($"Finished Processing {site.Logs.Count} Logs!");
-            }
-            GC.Collect();
-        }
+			// var searchPattern = settings.SearchPattern ?? "*.*";
+			// var searchPath = settings.SearchPath ?? Directory.GetCurrentDirectory();
+			// var files = new DirectoryInfo(searchPath)
+			// 	.GetFiles(searchPattern, searchOptions);
+			//
+			// var totalFileSize = files
+			// 	.Sum(fileInfo => fileInfo.Length);
 
-        private static string RunExportLocationPrompt() {
-            return Prompt.Input<string>(message: "Where do you want to save the output? (Directory)",
-            $"{Environment.GetEnvironmentVariable("USERPROFILE")}\\IISLogManager_{DateTime.Now:yyMMdd}"
-);
-        }
 
-        private static IEnumerable<string> RunModeSelectPrompt(List<string> siteNameList) {
-            var mode = Prompt.Select("Do you want to get all sites, or specific sites?", new[] { "All", "Specific" });
-            Console.WriteLine($"You selected {mode}");
-            if (mode != "Specific") {
-                return siteNameList;
-            } else {
-                return RunSiteSelectPrompt(siteNameList);
-            }
-        }
-
-        private static IEnumerable<string> RunSiteSelectPrompt(List<string> siteNameList) {
-            var selectedSites = Prompt.MultiSelect("Choose which sites to work with: ", siteNameList, pageSize: 5)
-                .ToList();
-            Console.WriteLine($"You picked {string.Join(", ", selectedSites)}");
-            return selectedSites;
-        }
-
-        public static Task ProcessWrite(string filePath, string text) {
-            return WriteTextAsync(filePath, text);
-        }
-
-        /// <summary>
-        /// Borrowed from https://stackoverflow.com/questions/11774827/writing-to-a-file-asynchronously
-        /// </summary>
-        /// <param name="filePath"> Path to the file which is to be appended</param>
-        /// <param name="text"> Text to be appended</param>
-        /// <returns></returns>
-        static async Task WriteTextAsync(string filePath, string text) {
-            byte[] encodedText = Encoding.Unicode.GetBytes(text);
-
-            using (FileStream sourceStream = new(filePath,
-                FileMode.Append, FileAccess.Write, FileShare.None,
-                bufferSize: 4096, useAsync: true)) {
-                await sourceStream.WriteAsync(encodedText, 0, encodedText.Length);
-            };
-        }
-    }
-
-    enum Modes {
-        All,
-        Specific
-    }
+			return 0;
+		}
+	}
 }
