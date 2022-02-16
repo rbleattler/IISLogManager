@@ -1,8 +1,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
-using System.Diagnostics;
 using System.Text;
 using Microsoft.Web.Administration;
 
@@ -22,7 +20,7 @@ namespace IISLogManager.Core {
         public IISLogObjectCollection Logs = new();
 
         public System.Collections.Generic.List<string> CompressedLogs = new();
-
+        //TODO: Filter Logs
         // private bool LogsParsed = false;
         // private string ParsedLogsPath;
         private ParseEngine _logParser = new();

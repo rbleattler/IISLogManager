@@ -1,130 +1,150 @@
 ﻿using System;
 using System.IO;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
-using System.Threading.Tasks;
 
-namespace IISLogManager.Core {
-    [Serializable]
-    public class IISLogObject {
-        public Guid UniqueId { get; set; } = Guid.NewGuid();
+namespace IISLogManager.Core;
 
-        public DateTime LogDateTime { get; set; }
+[Serializable]
+public class IISLogObject : MPropertyAsStringSettable {
+	public Guid UniqueId { get; set; } = Guid.NewGuid();
 
-        public string sSitename { get; set; }
+	public DateTime LogDateTime { get; set; }
 
-        public string sComputername { get; set; }
+	public string sSitename { get; set; }
 
-        public string sIp { get; set; }
+	public string sComputername { get; set; }
 
-        public string csMethod { get; set; }
+	public string sIp { get; set; }
 
-        public string csUriStem { get; set; }
+	public string csMethod { get; set; }
 
-        public string csUriQuery { get; set; }
+	public string csUriStem { get; set; }
 
-        public int? sPort { get; set; }
+	public string csUriQuery { get; set; }
 
-        public string csUsername { get; set; }
+	public int? sPort { get; set; }
 
-        public string cIp { get; set; }
+	public string csUsername { get; set; }
 
-        public string csVersion { get; set; }
+	public string cIp { get; set; }
 
-        public string csUserAgent { get; set; }
+	public string csVersion { get; set; }
 
-        public string csCookie { get; set; }
+	public string csUserAgent { get; set; }
 
-        public string csReferer { get; set; }
+	public string csCookie { get; set; }
 
-        public string csHost { get; set; }
+	public string csReferer { get; set; }
 
-        public int? scStatus { get; set; }
+	public string csHost { get; set; }
 
-        public int? scSubstatus { get; set; }
+	public int? scStatus { get; set; }
 
-        public long? scWin32Status { get; set; }
+	public int? scSubstatus { get; set; }
 
-        public int? scBytes { get; set; }
+	public long? scWin32Status { get; set; }
 
-        public int? csBytes { get; set; }
+	public int? scBytes { get; set; }
 
-        public int? timeTaken { get; set; }
+	public int? csBytes { get; set; }
 
-        public string ToJson() {
-            string serializedObject = JsonConvert.SerializeObject(this, Formatting.None);
-            return serializedObject;
-        }
+	public int? timeTaken { get; set; }
 
-        public void AppendToFile(string filePath) {
-            AppendToFile(filePath, true);
-        }
+	public string xForwardedFor { get; set; }
 
-        public void AppendToFile(string filePath, bool withComma) {
-            string jsonLog;
-            if (!withComma) {
-                jsonLog = ToJson();
-            } else {
-                jsonLog = string.Format("{0},", ToJson());
-            }
-            File.AppendAllText(filePath, jsonLog);
-        }
-        public IISLogObject() { }
+	public string ToJson() {
+		string serializedObject = JsonConvert.SerializeObject(this, Formatting.None);
+		return serializedObject;
+	}
 
-        public IISLogObject(
-            Guid uniqueId,
-            DateTime logDateTime,
-            string sSitename,
-            string sComputername,
-            string sIp,
-            string csMethod,
-            string csUriStem,
-            string csUriQuery,
-            string csUsername,
-            string cIp,
-            string csVersion,
-            string csUserAgent,
-            string csCookie,
-            string csReferer,
-            string csHost
-        ) {
-            this.UniqueId = uniqueId;
-            this.LogDateTime = logDateTime;
-            this.sSitename = sSitename;
-            this.sComputername = sComputername;
-            this.sIp = sIp;
-            this.csMethod = csMethod;
-            this.csUriStem = csUriStem;
-            this.csUriQuery = csUriQuery;
-            this.csUsername = csUsername;
-            this.cIp = cIp;
-            this.csVersion = csVersion;
-            this.csUserAgent = csUserAgent;
-            this.csCookie = csCookie;
-            this.csReferer = csReferer;
-            this.csHost = csHost;
-        }
-        /// <summary> 
-        /// This is meant to build an IISLogObject from a hashtable / dictionary
-        /// </summary>
-        /// <param name="inputArgs"></param>
-        public IISLogObject(Hashtable inputArgs) {
-            var type = GetType();
-            var properties = type.GetProperties();
-            var propertyNames = new string[properties.Count()];
-            for (var i = 0; i < properties.Count(); i++) {
-                propertyNames.SetValue(properties[i].Name, i);
+	public void AppendToFile(string filePath) {
+		AppendToFile(filePath, true);
+	}
 
-            }
-            foreach (var key in inputArgs.Keys) {
-                if (propertyNames.Contains(key.ToString())) {
-                    var value = inputArgs[key];
-                    var thisProperty = type.GetProperty(key.ToString());
-                    thisProperty.SetValue(this, value);
-                }
-            }
-        }
-    }
+	public void AppendToFile(string filePath, bool withComma) {
+		string jsonLog;
+		if ( !withComma ) {
+			jsonLog = ToJson();
+		} else {
+			jsonLog = string.Format("{0},", ToJson());
+		}
+
+		File.AppendAllText(filePath, jsonLog);
+	}
+
+	public IISLogObject() { }
+
+	public IISLogObject(
+		Guid uniqueId,
+		DateTime logDateTime,
+		string sSitename,
+		string sComputername,
+		string sIp,
+		string csMethod,
+		string csUriStem,
+		string csUriQuery,
+		string csUsername,
+		string cIp,
+		string csVersion,
+		string csUserAgent,
+		string csCookie,
+		string csReferer,
+		string csHost,
+		string xForwardedFor
+	) {
+		this.UniqueId = uniqueId;
+		this.LogDateTime = logDateTime;
+		this.sSitename = sSitename;
+		this.sComputername = sComputername;
+		this.sIp = sIp;
+		this.csMethod = csMethod;
+		this.csUriStem = csUriStem;
+		this.csUriQuery = csUriQuery;
+		this.csUsername = csUsername;
+		this.cIp = cIp;
+		this.csVersion = csVersion;
+		this.csUserAgent = csUserAgent;
+		this.csCookie = csCookie;
+		this.csReferer = csReferer;
+		this.csHost = csHost;
+		this.xForwardedFor = xForwardedFor;
+	}
+
+	public void SetProperty(string propertyName, object value) {
+		typeof(IISLogObject)?.GetProperty(propertyName)?.SetValue(this, value);
+	}
+
+	public dynamic GetProperty(string propertyName) {
+		return typeof(IISLogObject)?.GetProperty(propertyName)?.GetValue(this, null);
+	}
+
+	/// <summary> 
+	/// This is meant to build an IISLogObject from a hashtable / dictionary
+	/// </summary>
+	/// <param name="inputArgs"></param>
+	public IISLogObject(Dictionary<string, string> inputArgs) {
+		var type = GetType();
+		var properties = type.GetProperties();
+		var propertyNames = new string[properties.Count()];
+		for (var i = 0; i < properties.Count(); i++) {
+			if ( propertyNames.Contains(properties[i].Name) ) {
+				// properties.SetValue(properties[i].Name, i);
+				this.SetProperty(properties[i].Name, i);
+			}
+		}
+
+		if ( inputArgs["date"] != null && inputArgs["time"] != null ) {
+			DateTime finalDate = DateTime.Parse($"{inputArgs["date"]} {inputArgs["time"]}");
+		}
+
+		foreach (var key in inputArgs.Keys) {
+			if ( propertyNames.Contains(key.ToString()) ) {
+				var value = inputArgs[key];
+				var thisProperty = type.GetProperty(key.ToString());
+				thisProperty.SetValue(this, value);
+			}
+		}
+	}
 }

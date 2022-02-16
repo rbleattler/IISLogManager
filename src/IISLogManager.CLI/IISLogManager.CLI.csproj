@@ -6,11 +6,14 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<NeutralLanguage>en-US</NeutralLanguage>
+		<SelfContained>true</SelfContained>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 	</PropertyGroup>
 	<ItemGroup>
 		<Compile Remove="scratch\**" />
 		<EmbeddedResource Remove="scratch\**" />
 		<None Remove="scratch\**" />
+		<Compile Remove="Fascia.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<!-- 

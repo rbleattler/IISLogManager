@@ -5,6 +5,11 @@ using Spectre.Console.Cli;
 namespace IISLogManager.CLI;
 
 public class Settings : CommandSettings {
+	private static readonly DateOnly _today = DateOnly.FromDateTime(DateTime.Today);
+	private static readonly DateOnly _oneYearAgoToday = DateOnly.FromDateTime(DateTime.Today.AddYears(-1));
+	public static readonly string TodayString = _today.ToString();
+	public static readonly string OneYearAgoTodayString = _oneYearAgoToday.ToString();
+
 	[CommandArgument(0, "[GetSites]")]
 	[Description("Lists all websites [DarkOrange]Name[/][Blue] (Url)[/]")]
 	public string? GetSites { get; init; }
@@ -21,11 +26,11 @@ public class Settings : CommandSettings {
 
 	[Description("[DarkOrange](-r Target)[/]\t\tSite [yellow]Names[/]")]
 	[CommandOption("-s|--sites")]
-	public string[]? SiteNames { get; set; }
+	public string? SiteNames { get; set; }
 
 	[Description("[DarkOrange](-r Target)[/]\t\tSite [yellow]Urls[/]")]
 	[CommandOption("-S|--Sites")]
-	public string[]? SiteUrls { get; set; }
+	public string? SiteUrls { get; set; }
 
 	[Description("Output Mode.\t\t[blue]Local[/] disk / [blue]Remote[/] endpoint")]
 	[CommandOption("-O|--OutputMode")]
@@ -41,6 +46,22 @@ public class Settings : CommandSettings {
 	[DefaultValue("localhost:45352")]
 	public string? Uri { get; init; }
 
+	[Description($"[DarkOrange]Enable Filtering Logs[/]")]
+	[CommandOption("-F|--Filter")]
+	[DefaultValue(false)]
+	public bool Filter { get; init; }
+
+	[Description($"[DarkOrange](-F true)[/]\t\t\tFormat:\t\"MM*dd*yyyy\"")]
+	[CommandOption("-f|--FromDate")]
+	// [DefaultValue(value: GetTodayString())]
+	public string? FromDate { get; init; }
+	
+	[Description($"[DarkOrange](-F true)[/]\t\t\tFormat:\t\"MM*dd*yyyy\"")]
+	[CommandOption("-t|--ToDate")]
+	// [DefaultValue(value: GetTodayString())]
+	public string? ToDate { get; init; }
+
+	public Settings() { }
 
 	public override ValidationResult Validate() {
 		//TODO: Add ParameterSet validation
