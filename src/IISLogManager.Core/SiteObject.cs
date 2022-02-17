@@ -99,6 +99,17 @@ namespace IISLogManager.Core {
 			stream.Dispose();
 		}
 
+		public string GetLogFileName(string? targetDirectory) {
+			if ( targetDirectory == null ) {
+				targetDirectory =
+					$"{Environment.GetEnvironmentVariable("USERPROFILE")}\\IISLogManager\\{DateTime.Now.ToString("yyyy-MM-dd")}";
+			}
+
+			var outFileName =
+				$"{targetDirectory}\\{Utils.MakeSafeFilename(SiteName, '-')}_{Utils.GetRandom(5)}";
+			return outFileName;
+		}
+
 		//TODO: This is redundant. Need to cleanup redundant methods
 		// private string BuildJsonFileContent() {
 		// 	StringBuilder stringBuilder = new StringBuilder();
