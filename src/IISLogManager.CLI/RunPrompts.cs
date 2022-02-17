@@ -96,7 +96,7 @@ public class RunPrompts {
 			});
 			targetSites?.AddRange(filteredSites);
 		}
-		
+
 		filterConfiguration.FilterState = AnsiConsole.Prompt(FilterPrompt) ? FilterState.Enabled : FilterState.Disabled;
 		if ( filterConfiguration.FilterState == FilterState.Enabled ) {
 			filterConfiguration.SetFromDate(AnsiConsole.Prompt(StartDatePrompt));
@@ -109,7 +109,7 @@ public class RunPrompts {
 					var lwt = File.GetLastWriteTime(path);
 					return lwt > fromDate && lwt < toDate;
 				});
-				site.LogFilePaths = allPaths.ToArray();
+				site.LogFilePaths = filteredPaths.ToArray();
 			}
 		}
 	}
