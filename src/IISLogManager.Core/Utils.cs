@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace IISLogManager.Core {
@@ -110,6 +111,22 @@ namespace IISLogManager.Core {
 			}
 
 			return lineCount;
+		}
+
+		/// <summary>
+		/// Gets a random integer by digit length
+		/// </summary>
+		/// <example>GetRandom(3) : 523</example>
+		/// <example>GetRandom(3) : 872</example>
+		/// <example>GetRandom(6) : 124015</example>
+		/// <example>GetRandom(6) : 928341</example>
+		/// <param name="length"></param>
+		/// <returns></returns>
+		public static int GetRandom(int length) {
+			Random rand = new();
+			var minLengthString = $"1{string.Join("", Enumerable.Repeat(0, length - 1))}";
+			var maxLengthString = string.Join("", Enumerable.Repeat(9, length));
+			return rand.Next(int.Parse(minLengthString), int.Parse(maxLengthString));
 		}
 
 		/// <summary>
