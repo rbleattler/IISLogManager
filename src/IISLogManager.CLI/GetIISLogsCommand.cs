@@ -81,6 +81,4 @@ class GetIISLogsCommand : Command<Settings> {
 
 		return 0;
 	}
-
-	public FilterConfiguration FilterConfiguration { get; set; }
 }

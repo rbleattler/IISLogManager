@@ -12,7 +12,7 @@ public class CommandConfiguration {
 	public string? OutputUri { get; set; }
 	public Settings? Settings { get; set; }
 
-	public static AnsiConsoleOutput NerdStats { get; set; }
+	public static AnsiConsoleOutput? NerdStats { get; set; }
 
 	public CommandConfiguration() { }
 

@@ -31,10 +31,11 @@ public class CommandProcessor {
 						foreach (string siteUrl in
 						         settings.SiteUrls?.Split(',', StringSplitOptions.RemoveEmptyEntries)!) {
 							var tsAdd = iisController.Sites.Where(sO => sO.SiteUrl == siteUrl.Trim());
-							sites.AddRange(tsAdd);
+							sites?.AddRange(tsAdd);
 						}
 					}
 				}
+
 				if ( runmode == RunMode.All ) {
 					sites?.AddRange(iisController.Sites);
 				}
