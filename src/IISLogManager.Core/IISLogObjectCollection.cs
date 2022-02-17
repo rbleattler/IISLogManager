@@ -12,7 +12,7 @@ namespace IISLogManager.Core {
 		public IISLogObjectCollection(int capacity) : base(capacity) { }
 
 		public int CompareTo(IISLogObjectCollection other) {
-			throw new System.NotImplementedException();
+			throw new NotImplementedException();
 		}
 
 		public int CompareTo(object obj) {
@@ -96,7 +96,7 @@ namespace IISLogManager.Core {
 
 		public void FilterLogs(DateTime startDate, DateTime endDate) {
 			var filteredLogs = this.Where(l => { return l.LogDateTime >= startDate && l.LogDateTime <= endDate; });
-			this.RemoveAll(l => !filteredLogs.Contains(l));
+			RemoveAll(l => !filteredLogs.Contains(l));
 		}
 
 		public byte[] ToJsonByteArray() {

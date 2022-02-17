@@ -4,6 +4,7 @@ using Spectre.Console;
 namespace IISLogManager.CLI;
 
 public class RunPrompts {
+	private static FilterConfiguration filterConfig = new();
 	// private static Settings settings;
 
 	public static SelectionPrompt<RunMode> RunModePrompt = new SelectionPrompt<RunMode>()
@@ -30,6 +31,35 @@ public class RunPrompts {
 				$"{Environment.GetEnvironmentVariable("USERPROFILE")}\\IISLogManager\\{DateTime.Now.ToString("yyyy-MM-dd")}"
 			);
 
+	public static SelectionPrompt<dynamic> FilterPrompt =
+		new SelectionPrompt<dynamic>()
+			.Title("Would you like to filter the logs by date?")
+			.PageSize(3)
+			.AddChoices("(Y)es", "(N)o")
+			// Convert choice to bool value
+			.UseConverter(s => {
+				switch (s) {
+					case "Yes":
+					case "yes":
+					case "Y":
+					case "y":
+						s = true;
+						break;
+					case "No":
+					case "no":
+					case "N":
+					case "n":
+						s = false;
+						break;
+				}
+
+				return s;
+			});
+
+	public static TextPrompt<string> StartDatePrompt = new(@"Enter the start date to parse logs from (MM/dd/yyyy)");
+	public static TextPrompt<string> EndDatePrompt = new(@"Enter the end date to parse logs from (MM/dd/yyyy)");
+
+
 	public static TextPrompt<string> OutUriPrompt =
 		new TextPrompt<string>("Enter the remote endpoint URI (including protocol & port if necessary)");
 
@@ -37,7 +67,7 @@ public class RunPrompts {
 
 	public static void ExecutePrompts(ref RunMode? runMode, ref OutputMode? outputMode, ref string? outputUri,
 		ref string? outputDirectory, ref List<string> siteChoices, ref IISController iisController,
-		ref SiteObjectCollection? targetSites) {
+		ref SiteObjectCollection? targetSites, ref FilterConfiguration filterConfiguration) {
 		runMode = AnsiConsole.Prompt(RunModePrompt);
 		outputMode = AnsiConsole.Prompt(OutputModePrompt);
 		if ( outputMode == OutputMode.Remote ) {
@@ -66,7 +96,21 @@ public class RunPrompts {
 			});
 			targetSites?.AddRange(filteredSites);
 		}
+		
+		filterConfiguration.FilterState = AnsiConsole.Prompt(FilterPrompt) ? FilterState.Enabled : FilterState.Disabled;
+		if ( filterConfiguration.FilterState == FilterState.Enabled ) {
+			filterConfiguration.SetFromDate(AnsiConsole.Prompt(StartDatePrompt));
+			filterConfiguration.SetToDate(AnsiConsole.Prompt(EndDatePrompt));
+			foreach (var site in targetSites!) {
+				var fromDate = filterConfiguration.FromDate;
+				var toDate = filterConfiguration.ToDate;
+				var allPaths = site.LogFilePaths.ToList();
+				var filteredPaths = allPaths.Where(path => {
+					var lwt = File.GetLastWriteTime(path);
+					return lwt > fromDate && lwt < toDate;
+				});
+				site.LogFilePaths = allPaths.ToArray();
+			}
+		}
 	}
-	
-	
 }

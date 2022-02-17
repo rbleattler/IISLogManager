@@ -3,27 +3,31 @@
 namespace IISLogManager.CLI;
 
 public class CommandConfiguration {
-	public IISController IISController { get; set; }
-	public SiteObjectCollection SiteObjectCollection { get; set; }
-	public RunMode RunMode { get; set; }
-	public OutputMode OutputMode { get; set; }
-	public string OutputDirectory { get; set; }
-	public string OutputUri { get; set; }
+	public IISController? IISController { get; set; }
+	public SiteObjectCollection? TargetSites { get; set; }
+	public static RunMode? RunMode { get; set; }
+	public static OutputMode? OutputMode { get; set; }
+	public string? OutputDirectory { get; set; }
+	public string? OutputUri { get; set; }
+	public Settings? Settings { get; set; }
 
+	public CommandConfiguration() { }
 
 	public CommandConfiguration(
 		IISController iisController,
-		SiteObjectCollection siteObjectCollection,
-		RunMode runMode,
-		OutputMode outputMode,
-		string outputDirectory,
-		string outputUri
+		SiteObjectCollection? targetSites,
+		RunMode? runMode,
+		OutputMode? outputMode,
+		string? outputDirectory,
+		string? outputUri,
+		Settings? settings
 	) {
-		this.IISController = iisController;
-		SiteObjectCollection = siteObjectCollection;
+		IISController = iisController;
+		TargetSites = targetSites;
 		RunMode = runMode;
 		OutputMode = outputMode;
 		OutputDirectory = outputDirectory;
 		OutputUri = outputUri;
+		Settings = settings;
 	}
 }

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using IISLogManager.Core;
+﻿using IISLogManager.Core;
 using Spectre.Console;
 
 namespace IISLogManager.CLI;
@@ -36,7 +35,6 @@ public class CommandProcessor {
 						}
 					}
 				}
-
 				if ( runmode == RunMode.All ) {
 					sites?.AddRange(iisController.Sites);
 				}
@@ -52,13 +50,18 @@ public class CommandProcessor {
 		}
 	}
 
-	public int GetSites(IISController iisController, List<string> siteChoices, Settings settings) {
+	public int GetSites(List<string> siteChoices) {
 		AnsiConsole.MarkupLine("[DarkOrange]Site Name[/]\t([Blue]Site Url[/])");
 		siteChoices.ForEach((s) => { AnsiConsole.MarkupLine($"{s}"); });
 		return 0;
 	}
 
-	public void ProcessLogs(IISController iisController, SiteObjectCollection targetSites) {
+	public void ProcessLogs(CommandConfiguration config) {
+		config.TargetSites?.ForEach(s => {
+			
+			
+			//TODO: stuff
+		});
 		//TODO: Process Logs
 	}
 

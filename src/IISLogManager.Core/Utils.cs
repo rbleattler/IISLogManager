@@ -69,7 +69,7 @@ namespace IISLogManager.Core {
 		}
 
 		public static string MakeSafeFilename(string fileName, char replaceChar) {
-			var invalidChars = System.IO.Path.GetInvalidFileNameChars();
+			var invalidChars = Path.GetInvalidFileNameChars();
 			return invalidChars.Aggregate(fileName, (current, c) => current.Replace(c, replaceChar));
 		}
 
