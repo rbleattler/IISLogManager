@@ -56,13 +56,22 @@ public class CommandProcessor {
 		return 0;
 	}
 
-	public void ProcessLogs(CommandConfiguration config) {
-		config.TargetSites?.ForEach(s => {
-			
-			
-			//TODO: stuff
-		});
-		//TODO: Process Logs
+	public void ProcessLogs(ref CommandConfiguration config) {
+		if ( config.TargetSites != null )
+			foreach (var site in config.TargetSites) {
+				site.ParseAllLogs();
+				if ( config.Settings?.OutputMode == OutputMode.Local ) {
+					if ( config.Settings != null && config.Settings.Filter ) {
+						site.Logs.FilterLogs(
+							DateTime.Parse(config.Settings.FromDate!),
+							DateTime.Parse(config.Settings.ToDate!)
+						);
+					}
+
+					site.Logs.WriteToFile(site.GetLogFileName(config.OutputDirectory));
+				}
+			}
+		//TODO: Process Logs for remote output
 	}
 
 
