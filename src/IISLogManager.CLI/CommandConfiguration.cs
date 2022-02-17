@@ -1,4 +1,5 @@
 ﻿using IISLogManager.Core;
+using Spectre.Console;
 
 namespace IISLogManager.CLI;
 
@@ -11,7 +12,19 @@ public class CommandConfiguration {
 	public string? OutputUri { get; set; }
 	public Settings? Settings { get; set; }
 
+	public static AnsiConsoleOutput NerdStats { get; set; }
+
 	public CommandConfiguration() { }
+
+	public CommandConfiguration(Settings settings) {
+		IISController = new();
+		TargetSites = new();
+		RunMode = settings.RunMode;
+		OutputMode = settings.OutputMode;
+		OutputDirectory = settings.OutputDirectory;
+		OutputUri = settings.Uri;
+		Settings = settings;
+	}
 
 	public CommandConfiguration(
 		IISController iisController,
