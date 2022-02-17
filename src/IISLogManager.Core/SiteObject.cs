@@ -99,7 +99,7 @@ namespace IISLogManager.Core {
 			stream.Dispose();
 		}
 
-		public string GetLogFileName(string? targetDirectory) {
+		public string GetLogFileName(string targetDirectory) {
 			if ( targetDirectory == null ) {
 				targetDirectory =
 					$"{Environment.GetEnvironmentVariable("USERPROFILE")}\\IISLogManager\\{DateTime.Now.ToString("yyyy-MM-dd")}";

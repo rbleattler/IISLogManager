@@ -74,9 +74,9 @@ class GetIISLogsCommand : Command<Settings> {
 			settings
 		);
 
-		//region: Connect and Send for Network Connection
-
-		//endregion
+		AnsiConsole.MarkupLine("[DarkOrange]Beginning Log Processsing...[/]");
+		CommandProcessor.instance.ProcessLogs(ref commandConfiguration);
+		AnsiConsole.MarkupLine("[DarkOrange]Finished Processing Logs![/]");
 
 
 		return 0;
