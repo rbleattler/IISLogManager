@@ -31,29 +31,31 @@ public class RunPrompts {
 				$"{Environment.GetEnvironmentVariable("USERPROFILE")}\\IISLogManager\\{DateTime.Now.ToString("yyyy-MM-dd")}"
 			);
 
-	public static SelectionPrompt<dynamic> FilterPrompt =
-		new SelectionPrompt<dynamic>()
+	public static SelectionPrompt<string> FilterPrompt =
+		new SelectionPrompt<string>()
 			.Title("Would you like to filter the logs by date?")
 			.PageSize(3)
-			.AddChoices("(Y)es", "(N)o")
+			.AddChoices("Yes", "No")
 			// Convert choice to bool value
 			.UseConverter(s => {
+				string output = string.Empty;
 				switch (s) {
 					case "Yes":
 					case "yes":
 					case "Y":
 					case "y":
-						s = true;
+						output = "Yes";
 						break;
 					case "No":
 					case "no":
 					case "N":
 					case "n":
-						s = false;
+					case null:
+						output = "No";
 						break;
 				}
 
-				return s;
+				return output;
 			});
 
 	public static TextPrompt<string> StartDatePrompt = new(@"Enter the start date to parse logs from (MM/dd/yyyy)");
@@ -97,7 +99,12 @@ public class RunPrompts {
 			targetSites?.AddRange(filteredSites);
 		}
 
-		filterConfiguration.FilterState = AnsiConsole.Prompt(FilterPrompt) ? FilterState.Enabled : FilterState.Disabled;
+		if ( runMode == RunMode.All ) {
+			targetSites = iisController.Sites;
+		}
+
+		var promptResponse = AnsiConsole.Prompt(FilterPrompt);
+		filterConfiguration.FilterState = promptResponse == "Yes" ? FilterState.Enabled : FilterState.Disabled;
 		if ( filterConfiguration.FilterState == FilterState.Enabled ) {
 			filterConfiguration.SetFromDate(AnsiConsole.Prompt(StartDatePrompt));
 			filterConfiguration.SetToDate(AnsiConsole.Prompt(EndDatePrompt));
