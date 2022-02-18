@@ -12,12 +12,11 @@ public class CommandProcessor {
 		var runmode = runMode;
 		AnsiConsole.Status()
 			.Start("Adding Sites...", ctx => {
-				if ( !settings!.Interactive && settings?.RunMode == RunMode.Target ) {
+				if ( !settings!.Interactive && settings.RunMode == RunMode.Target ) {
 					if ( settings.SiteNames?.Length > 0 ) {
 						AnsiConsole.MarkupLine($"Adding {settings.SiteNames?.Length} sites...");
 						string[]? splitSiteNames =
 							settings.SiteNames?.Split(',', StringSplitOptions.RemoveEmptyEntries);
-						;
 						foreach (string siteName in splitSiteNames!) {
 							var tsAdd = iisController.Sites.Where(
 								sO => sO.SiteName == siteName.Trim()
@@ -58,8 +57,13 @@ public class CommandProcessor {
 	}
 
 	public void ProcessLogs(ref CommandConfiguration config) {
-		if ( config.TargetSites != null )
+		//TODO: Add verbose output
+		AnsiConsole.MarkupLine("[[DEBUG]]  Checking if TargetSites is null...");
+		if ( config.TargetSites != null ) {
+			AnsiConsole.MarkupLine("[[DEBUG]] TargetSites is not null...");
 			foreach (var site in config.TargetSites) {
+				//TODO: TargetSites is null on 'all'
+				AnsiConsole.MarkupLine($"[[DEBUG]] Processing {site.SiteName}...");
 				site.ParseAllLogs();
 				if ( config.Settings?.OutputMode == OutputMode.Local ) {
 					if ( config.Settings != null && config.Settings.Filter ) {
@@ -72,9 +76,10 @@ public class CommandProcessor {
 					site.Logs.WriteToFile(site.GetLogFileName(config.OutputDirectory));
 				}
 			}
+		}
 		//TODO: Process Logs for remote output
 	}
 
 
-	public static CommandProcessor instance = new CommandProcessor();
+	public static CommandProcessor instance = new();
 }
