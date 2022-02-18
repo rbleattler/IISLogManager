@@ -25,6 +25,9 @@ namespace IISLogManager.Core {
 		//TODO: https://docs.microsoft.com/en-us/dotnet/api/system.collections.concurrent.concurrentbag-1?view=net-6.0
 		public void WriteToFile(string filePath) {
 			var byteLogs = ToJsonByteArray();
+			var targetDirectory = Path.GetDirectoryName(filePath);
+			if ( !Directory.Exists(targetDirectory) ) Directory.CreateDirectory(targetDirectory!);
+			if ( File.Exists(filePath) ) File.Create(filePath);
 			File.WriteAllBytes(filePath, byteLogs);
 		}
 
