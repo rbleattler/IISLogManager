@@ -2,5 +2,5 @@
 
 public enum OutputMode {
 	Local,
-	Network
+	Remote
 }
