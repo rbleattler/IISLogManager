@@ -18,8 +18,8 @@ class GetIISLogsCommand : Command<Settings> {
 		FilterConfiguration filterConfiguration =
 			new FilterConfiguration(
 				filterState: filter,
-				DateTime.Parse(fromDate ?? string.Empty),
-				DateTime.Parse(toDate ?? string.Empty)
+				fromDate == null ? DateTime.Today.AddYears(-5) : DateTime.Parse(fromDate),
+				toDate == null ? DateTime.Today : DateTime.Parse(toDate)
 			);
 		RunMode? runMode = settings.Interactive ? null : settings.RunMode;
 		OutputMode? outputMode = settings.OutputMode;
