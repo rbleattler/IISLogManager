@@ -20,7 +20,9 @@ public readonly struct FieldNameMatrix {
 	public readonly string ForwardedFor = "X-Forwarded-For";
 	public static readonly FieldNameMatrix Instance = new FieldNameMatrix();
 
+	public FieldNameMatrix() { }
+
 	public string GetProperty(string propertyName) {
-		return typeof(FieldNameMatrix)?.GetProperty(propertyName)?.GetValue(this).ToString();
+		return typeof(FieldNameMatrix).GetProperty(propertyName)?.GetValue(this).ToString();
 	}
 }
