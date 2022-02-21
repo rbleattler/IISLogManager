@@ -1,5 +1,9 @@
 # IISLogManager
 
+[![CodeQL](https://github.com/rbleattler/IISLogManager/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/rbleattler/IISLogManager/actions/workflows/codeql-analysis.yml)
+[![pages-build-deployment](https://github.com/rbleattler/IISLogManager/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/rbleattler/IISLogManager/actions/workflows/pages/pages-build-deployment)
+[![.NET](https://github.com/rbleattler/IISLogManager/actions/workflows/dotnet.yml/badge.svg)](https://github.com/rbleattler/IISLogManager/actions/workflows/dotnet.yml)
+
 IISLogManager was built to facilitate central logging of IIS log messages from any number of IIS servers and websites. The core components of the tool were originally built in Windows PowerShell to maintain compatibility across a number of different operating system versions. The PowerShell versions of the log Core will be available for the time being but may become deprecated at some point in the future.
 
 ><font color="dark red">**NOTE**</font> : This tool set is under active development. At this time there are likely many bugs.
