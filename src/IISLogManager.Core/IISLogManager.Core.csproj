@@ -5,6 +5,7 @@
 		<DefaultNamespace>IISLogManager.Core</DefaultNamespace>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<LangVersion>latest</LangVersion>
+		<NoWarn>CS8983</NoWarn>
 	</PropertyGroup>
 	<ItemGroup>
 		<Compile Remove="scratch\**" />
