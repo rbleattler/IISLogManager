@@ -7,7 +7,7 @@ namespace IISLogManager.Core {
 		// public ServerManager ServerManager = new ServerManager(true, @"%WinDir%\System32\inetsrv\config\applicationHost.config");
 		public readonly ServerManager ServerManager = new();
 		public SiteObjectCollection Sites = new();
-		private readonly SiteObjectFactory SiteObjectFactory = new();
+		private readonly SiteObjectFactory _siteObjectFactory = new();
 
 		/// <summary> 
 		/// Convert the Microsoft.Web.Administration Sites found in ServerManager.Sites to SiteObjects
@@ -15,7 +15,7 @@ namespace IISLogManager.Core {
 		public void GetExtendedSiteList() {
 			SiteCollection siteList = ServerManager.Sites;
 			foreach (Site site in siteList) {
-				Sites.Add(SiteObjectFactory.BuildSite(site));
+				Sites.Add(_siteObjectFactory.BuildSite(site));
 			}
 		}
 
