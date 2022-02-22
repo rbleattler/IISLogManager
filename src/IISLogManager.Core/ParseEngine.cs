@@ -5,10 +5,10 @@ using System.IO;
 namespace IISLogManager.Core {
 	public class ParseEngine : IDisposable {
 		public string FilePath {
-			get { return filePath; }
+			get { return _filePath; }
 			set {
-				filePath = value;
-				_mbSize = (int) new FileInfo(filePath).Length / 1024 / 1024;
+				_filePath = value;
+				MbSize = (int) new FileInfo(_filePath).Length / 1024 / 1024;
 			}
 		}
 
@@ -19,9 +19,9 @@ namespace IISLogManager.Core {
 
 		//private readonly StreamReader _logfile;
 		private string[] _headerFields;
-		Dictionary<string, string> dataStruct = new();
-		protected int _mbSize;
-		private string filePath;
+		Dictionary<string, string> _dataStruct = new();
+		protected int MbSize;
+		private string _filePath;
 
 		public ParseEngine(string filePath) {
 			if ( !File.Exists(filePath) ) {
@@ -29,13 +29,13 @@ namespace IISLogManager.Core {
 			}
 
 			FilePath = filePath;
-			_mbSize = (int) new FileInfo(filePath).Length / 1024 / 1024;
+			MbSize = (int) new FileInfo(filePath).Length / 1024 / 1024;
 		}
 
 		public ParseEngine() { }
 
 		public IEnumerable<IISLogObject> ParseLog() {
-			if ( _mbSize < 50 ) {
+			if ( MbSize < 50 ) {
 				return QuickProcess();
 			} else {
 				return LongProcess();
@@ -88,55 +88,55 @@ namespace IISLogManager.Core {
 			return new()  {
 				//TODO: How can I make this dynamic?
 				LogDateTime = GetEventDateTime(),
-				sSitename = dataStruct.ContainsKey("s-sitename") ? dataStruct["s-sitename"] : null,
-				sComputername = dataStruct.ContainsKey("s-computername") ? dataStruct["s-computername"] : null,
-				sIp = dataStruct.ContainsKey("s-ip") ? dataStruct["s-ip"] : null,
-				csMethod = dataStruct.ContainsKey("cs-method") ? dataStruct["cs-method"] : null,
-				csUriStem = dataStruct.ContainsKey("cs-uri-stem") ? dataStruct["cs-uri-stem"] : null,
-				csUriQuery = dataStruct.ContainsKey("cs-uri-query") ? dataStruct["cs-uri-query"] : null,
-				csUsername = dataStruct.ContainsKey("cs-username") ? dataStruct["cs-username"] : null,
-				cIp = dataStruct.ContainsKey("c-ip") ? dataStruct["c-ip"] : null,
-				csVersion = dataStruct.ContainsKey("cs-version") ? dataStruct["cs-version"] : null,
-				csUserAgent = dataStruct.ContainsKey("cs(User-Agent)") ? dataStruct["cs(User-Agent)"] : null,
-				csCookie = dataStruct.ContainsKey("cs(Cookie)") ? dataStruct["cs(Cookie)"] : null,
-				csReferer = dataStruct.ContainsKey("cs(Referer)") ? dataStruct["cs(Referer)"] : null,
-				csHost = dataStruct.ContainsKey("cs-host") ? dataStruct["cs-host"] : null,
-				xForwardedFor = dataStruct.ContainsKey("X-Forwarded-For") ? dataStruct["X-Forwarded-For"] : null,
-				sPort = dataStruct["s-port"] != null ? int.Parse(dataStruct["s-port"]) : (int?) null,
-				scStatus = dataStruct["sc-status"] != null
-					? int.Parse(dataStruct["sc-status"])
+				sSitename = _dataStruct.ContainsKey("s-sitename") ? _dataStruct["s-sitename"] : null,
+				sComputername = _dataStruct.ContainsKey("s-computername") ? _dataStruct["s-computername"] : null,
+				sIp = _dataStruct.ContainsKey("s-ip") ? _dataStruct["s-ip"] : null,
+				csMethod = _dataStruct.ContainsKey("cs-method") ? _dataStruct["cs-method"] : null,
+				csUriStem = _dataStruct.ContainsKey("cs-uri-stem") ? _dataStruct["cs-uri-stem"] : null,
+				csUriQuery = _dataStruct.ContainsKey("cs-uri-query") ? _dataStruct["cs-uri-query"] : null,
+				csUsername = _dataStruct.ContainsKey("cs-username") ? _dataStruct["cs-username"] : null,
+				cIp = _dataStruct.ContainsKey("c-ip") ? _dataStruct["c-ip"] : null,
+				csVersion = _dataStruct.ContainsKey("cs-version") ? _dataStruct["cs-version"] : null,
+				csUserAgent = _dataStruct.ContainsKey("cs(User-Agent)") ? _dataStruct["cs(User-Agent)"] : null,
+				csCookie = _dataStruct.ContainsKey("cs(Cookie)") ? _dataStruct["cs(Cookie)"] : null,
+				csReferer = _dataStruct.ContainsKey("cs(Referer)") ? _dataStruct["cs(Referer)"] : null,
+				csHost = _dataStruct.ContainsKey("cs-host") ? _dataStruct["cs-host"] : null,
+				xForwardedFor = _dataStruct.ContainsKey("X-Forwarded-For") ? _dataStruct["X-Forwarded-For"] : null,
+				sPort = _dataStruct["s-port"] != null ? int.Parse(_dataStruct["s-port"]) : (int?) null,
+				scStatus = _dataStruct["sc-status"] != null
+					? int.Parse(_dataStruct["sc-status"])
 					: (int?) null,
-				scSubstatus = dataStruct["sc-substatus"] != null
-					? int.Parse(dataStruct["sc-substatus"])
+				scSubstatus = _dataStruct["sc-substatus"] != null
+					? int.Parse(_dataStruct["sc-substatus"])
 					: (int?) null,
-				scWin32Status = dataStruct["sc-win32-status"] != null
-					? long.Parse(dataStruct["sc-win32-status"])
+				scWin32Status = _dataStruct["sc-win32-status"] != null
+					? long.Parse(_dataStruct["sc-win32-status"])
 					: (long?) null,
-				scBytes = dataStruct.ContainsKey("sc-bytes")
-					? (dataStruct["sc-bytes"] != null
-						? int.Parse(dataStruct["sc-bytes"])
+				scBytes = _dataStruct.ContainsKey("sc-bytes")
+					? (_dataStruct["sc-bytes"] != null
+						? int.Parse(_dataStruct["sc-bytes"])
 						: (int?) null)
 					: null,
-				csBytes = dataStruct.ContainsKey("cs-bytes")
-					? (dataStruct["cs-bytes"] != null
-						? int.Parse(dataStruct["cs-bytes"])
+				csBytes = _dataStruct.ContainsKey("cs-bytes")
+					? (_dataStruct["cs-bytes"] != null
+						? int.Parse(_dataStruct["cs-bytes"])
 						: (int?) null)
 					: null,
-				timeTaken = dataStruct["time-taken"] != null
-					? int.Parse(dataStruct["time-taken"])
+				timeTaken = _dataStruct["time-taken"] != null
+					? int.Parse(_dataStruct["time-taken"])
 					: (int?) null
 			};
 		}
 
 		private DateTime GetEventDateTime() {
-			DateTime finalDate = DateTime.Parse($"{dataStruct["date"]} {dataStruct["time"]}");
+			DateTime finalDate = DateTime.Parse($"{_dataStruct["date"]} {_dataStruct["time"]}");
 			return finalDate;
 		}
 
 		private void FillDataStruct(string[] fieldsData, string[] header) {
-			dataStruct.Clear();
+			_dataStruct.Clear();
 			for (int i = 0; i < header.Length; i++) {
-				dataStruct.Add(header[i], fieldsData[i] == "-" ? null : fieldsData[i]);
+				_dataStruct.Add(header[i], fieldsData[i] == "-" ? null : fieldsData[i]);
 			}
 		}
 
