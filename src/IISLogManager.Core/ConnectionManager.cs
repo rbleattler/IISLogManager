@@ -1,35 +1,53 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 
 namespace IISLogManager.Core;
 
 public class ConnectionManager {
-	private static HttpClientHandler NetClientHandler = new() {
+	private static HttpClientHandler _netClientHandler = new() {
 		//TODO: Add support for sending with non-default credentials
 		UseDefaultCredentials = true
 	};
 
-	private HttpClient NetClient = new(NetClientHandler);
-	public Uri Uri { get; set; }
+	private HttpClient _netClient = new(_netClientHandler);
+	public Uri? Uri { get; set; }
+	public string? BearerToken { get; set; }
 
 	public void SetConnection(string uri) {
 		//TODO: Set other defaults?
 		SetUri(uri);
-		NetClient
+		_netClient
 			.DefaultRequestHeaders
 			.Accept
 			.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-		NetClient
+		_netClient
 			.DefaultRequestHeaders
 			.Add("accept", "application/json");
 	}
 
+	public void SetConnection(string uri, string authToken) {
+		//TODO: Set other defaults?
+		SetUri(uri);
+		_netClient
+			.DefaultRequestHeaders
+			.Accept
+			.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+		_netClient
+			.DefaultRequestHeaders
+			.Add("accept", "application/json");
+		_netClient
+			.DefaultRequestHeaders
+			.Add("Authorization", "Bearer " + authToken);
+	}
+
 	public HttpStatusCode AddLog(IISLogObject log) {
 		var jsonLog = log.ToJson();
-		var postRequest = NetClient.PostAsync(
+		var postRequest = _netClient.PostAsync(
 			requestUri: Uri,
 			content: new StringContent(jsonLog, encoding: Encoding.GetEncoding(jsonLog))
 		);
@@ -37,13 +55,15 @@ public class ConnectionManager {
 		return postRequest.Result.StatusCode;
 	}
 
-	public HttpStatusCode AddLogs(IISLogObjectCollection logs) {
-		var byteLogs = logs.ToJsonByteArray();
-		var byteLogsMbSize = byteLogs.Length / 1024 / 1024;
+	public HttpStatusCode AddLogs(IISLogObjectCollection logs, string? siteUrl = null, string? siteName = null,
+		string? hostName = null) {
+		var byteLogs = logs.ToJsonByteArray(siteUrl, siteName, hostName);
+		//TODO: var byteLogsMbSize = byteLogs?.Length / 1024 / 1024;
 		//TODO: Stream if bytelogsMbSize > *some target size*
-		var postRequest = NetClient.PostAsync(
+		var postRequest = _netClient.PostAsync(
 			requestUri: Uri,
-			content: new ByteArrayContent(byteLogs)
+			content: new ByteArrayContent(byteLogs),
+			CancellationToken.None //TODO: CancellationTokens
 		);
 		postRequest.Wait();
 		return postRequest.Result.StatusCode;
@@ -56,4 +76,12 @@ public class ConnectionManager {
 	}
 
 	public ConnectionManager() { }
+
+	public ConnectionManager(string uri) {
+		SetConnection(uri);
+	}
+
+	public ConnectionManager(string uri, string authToken) {
+		SetConnection(uri, authToken);
+	}
 }

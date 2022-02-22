@@ -4,7 +4,7 @@ using Spectre.Console;
 namespace IISLogManager.CLI;
 
 public class RunPrompts {
-	private static FilterConfiguration filterConfig = new();
+	private static FilterConfiguration _filterConfig = new();
 	// private static Settings settings;
 
 	public static SelectionPrompt<RunMode> RunModePrompt = new SelectionPrompt<RunMode>()
@@ -58,6 +58,13 @@ public class RunPrompts {
 				return output;
 			});
 
+	public static SelectionPrompt<AuthMode> BearerAuthPrompt = new SelectionPrompt<AuthMode>()
+		.Title("How do you want to authenticate?")
+		.AddChoices(AuthMode.BearerToken, AuthMode.DefaultCredentials)
+		.PageSize(3);
+
+	public static TextPrompt<string> BearerTokenPrompt = new("Enter the Authorization token (without\"Bearer \"");
+
 	public static TextPrompt<string> StartDatePrompt = new(@"Enter the start date to parse logs from (MM/dd/yyyy)");
 	public static TextPrompt<string> EndDatePrompt = new(@"Enter the end date to parse logs from (MM/dd/yyyy)");
 
@@ -69,11 +76,16 @@ public class RunPrompts {
 
 	public static void ExecutePrompts(ref RunMode? runMode, ref OutputMode? outputMode, ref string? outputUri,
 		ref string? outputDirectory, ref List<string> siteChoices, ref IISController iisController,
-		ref SiteObjectCollection? targetSites, ref FilterConfiguration filterConfiguration) {
+		ref SiteObjectCollection? targetSites, ref FilterConfiguration filterConfiguration, ref AuthMode? authMode,
+		ref string? authToken) {
 		runMode = AnsiConsole.Prompt(RunModePrompt);
 		outputMode = AnsiConsole.Prompt(OutputModePrompt);
 		if ( outputMode == OutputMode.Remote ) {
 			outputUri = AnsiConsole.Prompt(OutUriPrompt);
+			authMode = AnsiConsole.Prompt(BearerAuthPrompt);
+			if ( authMode == AuthMode.BearerToken ) {
+				authToken = AnsiConsole.Prompt(BearerTokenPrompt);
+			}
 		}
 
 		if ( outputMode == OutputMode.Local ) {

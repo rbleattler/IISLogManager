@@ -25,19 +25,30 @@ class GetIISLogsCommand : Command<Settings> {
 		OutputMode? outputMode = settings.OutputMode;
 		var outputDirectory = settings.OutputDirectory;
 		var outputUri = settings.Uri;
+		var authMode = settings.AuthMode;
+		var authToken = settings.AuthToken;
 
 		List<string> siteChoices = new();
 		iisController.GetExtendedSiteList();
-		CommandProcessor.instance.ProcessTargetSites(ref targetSites, iisController, settings, ref runMode);
+		CommandProcessor.Instance.ProcessTargetSites(ref targetSites, iisController, settings, ref runMode);
 		if ( settings is {Interactive: true} || !string.IsNullOrWhiteSpace(settings.GetSites) ) {
-			CommandProcessor.instance.ProcessSiteChoices(iisController, ref siteChoices);
+			CommandProcessor.Instance.ProcessSiteChoices(iisController, ref siteChoices);
 			if ( settings.GetSites?.ToLower() == @"getsites" ) {
-				CommandProcessor.instance.GetSites(siteChoices);
+				CommandProcessor.Instance.GetSites(siteChoices);
 			}
 
-			RunPrompts.ExecutePrompts(ref runMode, ref outputMode, ref outputUri,
-				ref outputDirectory, ref siteChoices, ref iisController,
-				ref  targetSites, ref filterConfiguration);
+			RunPrompts.ExecutePrompts(
+				runMode: ref runMode,
+				outputMode: ref outputMode,
+				outputUri: ref outputUri,
+				outputDirectory: ref outputDirectory,
+				siteChoices: ref siteChoices,
+				iisController: ref iisController,
+				targetSites: ref  targetSites,
+				filterConfiguration: ref filterConfiguration,
+				authMode: ref authMode,
+				authToken: ref authToken
+			);
 		}
 
 		AnsiConsole.MarkupLine($"[DarkOrange]Run mode[/]: {runMode}");
@@ -65,17 +76,19 @@ class GetIISLogsCommand : Command<Settings> {
 		}
 
 		CommandConfiguration commandConfiguration = new(
-			iisController,
-			targetSites,
-			runMode,
-			outputMode,
-			outputDirectory,
-			outputUri,
-			settings
+			iisController: iisController,
+			targetSites: targetSites,
+			runMode: runMode,
+			outputMode: outputMode,
+			authMode: authMode,
+			authToken: authToken,
+			outputDirectory: outputDirectory,
+			outputUri: outputUri,
+			settings: settings
 		);
 
 		AnsiConsole.MarkupLine("[DarkOrange]Beginning Log Processsing...[/]");
-		CommandProcessor.instance.ProcessLogs(ref commandConfiguration);
+		CommandProcessor.Instance.ProcessLogs(ref commandConfiguration);
 		AnsiConsole.MarkupLine("[DarkOrange]Finished Processing Logs![/]");
 
 

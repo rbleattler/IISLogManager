@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,7 +15,7 @@ namespace IISLogManager.Core {
 			throw new NotImplementedException();
 		}
 
-		public int CompareTo(object obj) {
+		public int CompareTo(object? obj) {
 			if ( ReferenceEquals(null, obj) ) return 1;
 			if ( ReferenceEquals(this, obj) ) return 0;
 			return obj is IISLogObjectCollection other
@@ -31,7 +32,7 @@ namespace IISLogManager.Core {
 			File.WriteAllBytes(filePath, byteLogs);
 		}
 
-		public List<string> ToStringCollection() {
+		public List<string>? ToStringCollection() {
 			var list = new List<string>();
 			if ( !this.Any() ) return null;
 			foreach (var site in this) {
@@ -44,11 +45,24 @@ namespace IISLogManager.Core {
 
 		//TODO: Fix ToJson()
 		//I know there is a better way to do this... I just don't have the bandwidth at the moment... 
-		public string ToJson() {
+
+		public string? ToJson(string? siteUrl = null, string? siteName = null, string? hostName = null) {
 			if ( !this.Any() ) return null;
 			StringBuilder stringBuilder = new();
 			stringBuilder.AppendLine("{");
-			stringBuilder.AppendLine("[");
+			if ( null != siteName ) {
+				stringBuilder.AppendLine($"\"SiteName\" : \"{siteName}\"");
+			}
+
+			if ( null != siteUrl ) {
+				stringBuilder.AppendLine($"\"SiteUrl\" : \"{siteUrl}\"");
+			}
+
+			if ( null != hostName ) {
+				stringBuilder.AppendLine($"\"HostName\" : \"{hostName}\"");
+			}
+
+			stringBuilder.AppendLine("\"Logs\":[");
 			var processedCount = 0;
 			foreach (var site in this) {
 				var json = site.ToJson();
@@ -73,8 +87,15 @@ namespace IISLogManager.Core {
 			RemoveAll(l => !filteredLogs.Contains(l));
 		}
 
-		public byte[] ToJsonByteArray() {
-			return Encoding.ASCII.GetBytes(ToJson());
+		// public byte[]? ToJsonByteArray() {
+		// 	// return Encoding.ASCII.GetBytes(ToJson());
+		// 	return ToJsonByteArray(null, null, null);
+		// }
+
+		public byte[]? ToJsonByteArray(string? siteUrl = null, string? siteName = null, string? hostName = null) {
+			var jsonOut = ToJson(siteUrl ?? null, siteName ?? null, hostName ?? null);
+			if ( null != jsonOut ) return Encoding.ASCII.GetBytes(jsonOut);
+			return null;
 		}
 	}
 }

@@ -37,6 +37,16 @@ public class Settings : CommandSettings {
 	[DefaultValue(CLI.OutputMode.Local)]
 	public OutputMode? OutputMode { get; set; }
 
+	[Description(
+		"Remote Authorization Mode. (-O Remote)\t\tUse [blue]DefaultCredentials[/] disk or provide a [blue]BearerToken[/]")]
+	[CommandOption("-A|--AuthMode")]
+	[DefaultValue(CLI.AuthMode.DefaultCredentials)]
+	public AuthMode? AuthMode { get; set; }
+
+	[Description("Remote Authorization token. (-O Remote)\t\tProvide a [blue]BearerToken[/] (Excluide \"Bearer \")")]
+	[CommandOption("-a|--AuthToken")]
+	public string? AuthToken { get; set; }
+
 	[Description("[DarkOrange](-O Local)[/]")]
 	[CommandOption("-o|--OutputDirectory")]
 	public string? OutputDirectory { get; set; }
