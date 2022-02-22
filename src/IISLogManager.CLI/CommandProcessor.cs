@@ -56,30 +56,63 @@ public class CommandProcessor {
 		return 0;
 	}
 
+	//TODO: Ensure there *ARE* logs to process before beginning processing... 
 	public void ProcessLogs(ref CommandConfiguration config) {
 		//TODO: Add verbose output
-		AnsiConsole.MarkupLine("[[DEBUG]]  Checking if TargetSites is null...");
+		// AnsiConsole.MarkupLine("[[DEBUG]]  Checking if TargetSites is null...");
 		if ( config.TargetSites != null ) {
-			AnsiConsole.MarkupLine("[[DEBUG]] TargetSites is not null...");
+			// AnsiConsole.MarkupLine("[[DEBUG]] TargetSites is not null...");
 			foreach (var site in config.TargetSites) {
-				//TODO: TargetSites is null on 'all'
 				AnsiConsole.MarkupLine($"[[DEBUG]] Processing {site.SiteName}...");
 				site.ParseAllLogs();
-				if ( config.Settings?.OutputMode == OutputMode.Local ) {
-					if ( config.Settings != null && config.Settings.Filter ) {
-						site.Logs.FilterLogs(
-							DateTime.Parse(config.Settings.FromDate!),
-							DateTime.Parse(config.Settings.ToDate!)
-						);
+				if ( site.Logs.Count <= 0 ) {
+					AnsiConsole.MarkupLine($"[DarkOrange]{site.SiteName}[/] has no logs from the target date range...");
+					break;
+				}
+
+				if ( config.Settings != null && config.Settings.Filter ) {
+					AnsiConsole.MarkupLine($"[[DEBUG]] Filtering enabled...");
+
+					site.Logs.FilterLogs(
+						DateTime.Parse(config.Settings.FromDate!),
+						DateTime.Parse(config.Settings.ToDate!)
+					);
+				}
+
+				if ( config.OutputMode == OutputMode.Local ) {
+					AnsiConsole.MarkupLine($"[[DEBUG]] Output mode Local...");
+					var outFile = site.GetLogFileName(config.OutputDirectory);
+					site.Logs.WriteToFile(outFile);
+					AnsiConsole.MarkupLine($"[DarkOrange]Output File :[/] {outFile}");
+				}
+
+				if ( config.OutputMode == OutputMode.Remote ) {
+					AnsiConsole.MarkupLine($"[[DEBUG]] Output mode Remote...");
+					if ( string.IsNullOrWhiteSpace(config.OutputUri) ) {
+						throw new UriNotSpecifiedException();
 					}
 
-					site.Logs.WriteToFile(site.GetLogFileName(config.OutputDirectory));
+					if ( config.OutputUri != null ) {
+						ConnectionManager connectionManager = new();
+						connectionManager.SetConnection(config.OutputUri);
+						if ( config.AuthMode == AuthMode.BearerToken ) {
+							if ( config.AuthToken != null )
+								connectionManager.SetConnection(config.OutputUri, config.AuthToken);
+						}
+
+						//TODO: Chunk processing
+						//TODO: Is returning 401/400, need to work on this
+						var response = connectionManager.AddLogs(site.Logs, site.SiteUrl, site.SiteName, site.HostName);
+						AnsiConsole.MarkupLine($"[DarkOrange]Server Response :[/]{response}");
+					}
+
+
+					//TODO: Process Logs for remote output
 				}
 			}
 		}
-		//TODO: Process Logs for remote output
 	}
 
 
-	public static CommandProcessor instance = new();
+	public static CommandProcessor Instance = new();
 }
