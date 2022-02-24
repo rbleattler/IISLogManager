@@ -32,6 +32,7 @@ jobs:
     - name: Get Version
       id: version
       uses: battila7/get-version-action@v2
+ 
 
     - name: Build packages
       run: dotnet build ${{ env.CORE_PROJECT_PATH }} --no-restore --configuration Release -p:Version=${{ steps.version.outputs.version-without-v }}
