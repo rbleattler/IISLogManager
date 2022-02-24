@@ -96,8 +96,11 @@ public class CommandProcessor {
 						ConnectionManager connectionManager = new();
 						connectionManager.SetConnection(config.OutputUri);
 						if ( config.AuthMode == AuthMode.BearerToken ) {
-							if ( config.AuthToken != null )
-								connectionManager.SetConnection(config.OutputUri, config.AuthToken);
+							if ( config.AuthToken != null ) connectionManager.BearerToken = config.AuthToken;
+							connectionManager.SetConnection(
+								config.OutputUri,
+								connectionManager.BearerToken ?? throw new NullAuthTokenException()
+							);
 						}
 
 						//TODO: Chunk processing

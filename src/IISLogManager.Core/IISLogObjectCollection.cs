@@ -48,6 +48,7 @@ namespace IISLogManager.Core {
 
 		public string? ToJson(string? siteUrl = null, string? siteName = null, string? hostName = null) {
 			if ( !this.Any() ) return null;
+			//TODO: Create an object builder for sending remote data
 			StringBuilder stringBuilder = new();
 			stringBuilder.AppendLine("{");
 			if ( null != siteName ) {

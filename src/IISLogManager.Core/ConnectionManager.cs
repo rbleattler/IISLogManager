@@ -15,8 +15,13 @@ public class ConnectionManager {
 	};
 
 	private HttpClient _netClient = new(_netClientHandler);
+
 	public Uri? Uri { get; set; }
+
+	public string? Uristring { get; private set; }
+
 	public string? BearerToken { get; set; }
+
 
 	public void SetConnection(string uri) {
 		//TODO: Set other defaults?
@@ -33,6 +38,7 @@ public class ConnectionManager {
 	public void SetConnection(string uri, string authToken) {
 		//TODO: Set other defaults?
 		SetUri(uri);
+		SetAuthToken(authToken);
 		_netClient
 			.DefaultRequestHeaders
 			.Accept
@@ -42,7 +48,7 @@ public class ConnectionManager {
 			.Add("accept", "application/json");
 		_netClient
 			.DefaultRequestHeaders
-			.Add("Authorization", "Bearer " + authToken);
+			.Add("Authorization", "Bearer " + BearerToken);
 	}
 
 	public HttpStatusCode AddLog(IISLogObject log) {
@@ -55,9 +61,11 @@ public class ConnectionManager {
 		return postRequest.Result.StatusCode;
 	}
 
-	public HttpStatusCode AddLogs(IISLogObjectCollection logs, string? siteUrl = null, string? siteName = null,
+	public HttpStatusCode AddLogs(IISLogObjectCollection logs, string? siteUrl = null,
+		string? siteName = null,
 		string? hostName = null) {
 		var byteLogs = logs.ToJsonByteArray(siteUrl, siteName, hostName);
+		//TODO: URGENT Mirror C:\Repos\IISLogManager\IISLogManager\Public\Compress-Data.ps1
 		//TODO: var byteLogsMbSize = byteLogs?.Length / 1024 / 1024;
 		//TODO: Stream if bytelogsMbSize > *some target size*
 		var postRequest = _netClient.PostAsync(
@@ -70,9 +78,13 @@ public class ConnectionManager {
 		//TODO: StatusCode Error Handler 
 	}
 
-
 	private void SetUri(string uri) {
 		Uri = new Uri(uri);
+		Uristring = Uri.ToString();
+	}
+
+	private void SetAuthToken(string authToken) {
+		BearerToken = authToken;
 	}
 
 	public ConnectionManager() { }
