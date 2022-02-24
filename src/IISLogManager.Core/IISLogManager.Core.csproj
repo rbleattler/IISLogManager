@@ -3,7 +3,8 @@
         <!--Package Info-->
         <Authors>Robert Bleattler</Authors>
         <PackageId>IISLogManager.Core</PackageId>
-        <Version>0.0.0</Version>
+        <PackageVersion>0.0.1-beta-1</PackageVersion>
+        <Version>0.0.1-beta-1</Version>
         <!---->
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <AssemblyName>IISLogManager.Core</AssemblyName>
@@ -13,17 +14,16 @@
         <NoWarn>CS8983</NoWarn>
         <Title>IISLogManager.Core</Title>
         <Description>A class library containing tools to manage IIS Logs</Description>
-        <Copyright>Robert Bleattler 2022</Copyright>
+        <Copyright>Robert Bleattler</Copyright>
         <PackageProjectUrl>https://github.com/rbleattler/IISLogManager</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/rbleattler/IISLogManager/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/rbleattler/IISLogManager</RepositoryUrl>
         <PackageTags>IIS, Logs, Log Management, Web Logs, W3C</PackageTags>
-        <AssemblyVersion>0.0.0</AssemblyVersion>
     </PropertyGroup>
     <ItemGroup>
-        <Compile Remove="scratch\**"/>
-        <EmbeddedResource Remove="scratch\**"/>
-        <None Remove="scratch\**"/>
+        <Compile Remove="scratch\**" />
+        <EmbeddedResource Remove="scratch\**" />
+        <None Remove="scratch\**" />
     </ItemGroup>
     <ItemGroup>
         <!-- 
@@ -32,8 +32,8 @@
         <PackageReference Include="Newtonsoft.Json" Version="12.0.1">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.0"/>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="Microsoft.Web.Administration" Version="11.1.0">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
