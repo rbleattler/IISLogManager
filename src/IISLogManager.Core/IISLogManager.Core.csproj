@@ -3,8 +3,8 @@
         <!--Package Info-->
         <Authors>Robert Bleattler</Authors>
         <PackageId>IISLogManager.Core</PackageId>
-        <PackageVersion>0.0.1-beta-1</PackageVersion>
-        <Version>0.0.1-beta-1</Version>
+        <!--        <PackageVersion>0.0.1-beta-1</PackageVersion>-->
+        <!--        <Version>0.0.1-beta-1</Version>-->
         <!---->
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <AssemblyName>IISLogManager.Core</AssemblyName>
