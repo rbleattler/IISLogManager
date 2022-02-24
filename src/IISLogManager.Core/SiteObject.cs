@@ -106,7 +106,7 @@ namespace IISLogManager.Core {
 			}
 
 			var outFileName =
-				$"{targetDirectory}\\{Utils.MakeSafeFilename(SiteName, '-')}_{Utils.GetRandom(5)}";
+				$"{targetDirectory}\\{Utils.MakeSafeFilename(SiteName, '-')}-{Utils.GetRandom(5)}";
 			return outFileName;
 		}
 
