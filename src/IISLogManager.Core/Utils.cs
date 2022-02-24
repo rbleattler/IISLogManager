@@ -68,10 +68,13 @@ namespace IISLogManager.Core {
 				return Encoding.UTF8.GetString(buffer);
 			}
 		}
+
 		//TODO: Summary
 		public static string MakeSafeFilename(string fileName, char replaceChar) {
 			var invalidChars = Path.GetInvalidFileNameChars();
-			return invalidChars.Aggregate(fileName, (current, c) => current.Replace(c, replaceChar));
+			var invalidCharsPlusSpace = invalidChars.ToList();
+			invalidCharsPlusSpace.Add(' ');
+			return invalidCharsPlusSpace.Aggregate(fileName, (current, c) => current.Replace(c, replaceChar));
 		}
 
 		/// <summary>
