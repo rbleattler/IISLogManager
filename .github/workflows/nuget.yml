@@ -1,20 +1,24 @@
 ﻿name: "Deploy NuGet Package"
-on:
-  push:
-    tags:
-      - 'v*'
+
 env:
   CORE_PROJECT_PATH: 'src/IISLogManager.Core/IISLogManager.Core.csproj'
   CLI_PROJECT_PATH: 'src/IISLogManager.CLI/IISLogManager.CLI.csproj'
   PACKAGE_OUTPUT_DIR: ${{ github.workspace }}\output
   NUGET_SOURCE_URL: 'https://api.nuget.org/v3/index.json'
 
+on:
+  push:
+    branches: [ develop ]
+    tags:
+      - 'v*'
+
 jobs:
   deploy:
-    name: Deploy
     runs-on: ubuntu-latest
+    name: Deploy
     steps:
-      - uses: actions/checkout@v2
+      - name: checkout
+        uses: actions/checkout@v2
 
       - name: Install dotnet
         uses: actions/setup-dotnet@v1
@@ -30,7 +34,6 @@ jobs:
 
       - name: Build packages
         run: dotnet build ${{ env.CORE_PROJECT_PATH }} --no-restore --configuration Release -p:Version=${{ steps.version.outputs.version-without-v }}
-
 
       - name: Pack packages
         run: dotnet pack ${{ env.CORE_PROJECT_PATH }} --no-restore --no-build --configuration Release --include-symbols -p:PackageVersion=${{ steps.version.outputs.version-without-v }} --output ${{ env.PACKAGE_OUTPUT_DIR }}
