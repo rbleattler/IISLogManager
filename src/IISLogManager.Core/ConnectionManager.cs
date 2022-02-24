@@ -18,7 +18,7 @@ public class ConnectionManager {
 
 	public Uri? Uri { get; set; }
 
-	public string? Uristring { get; private set; }
+	public string? UriString { get; private set; }
 
 	public string? BearerToken { get; set; }
 
@@ -80,7 +80,7 @@ public class ConnectionManager {
 
 	private void SetUri(string uri) {
 		Uri = new Uri(uri);
-		Uristring = Uri.ToString();
+		UriString = Uri.ToString();
 	}
 
 	private void SetAuthToken(string authToken) {
