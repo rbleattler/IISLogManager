@@ -34,7 +34,7 @@ class GetIISLogsCommand : Command<Settings> {
 		if ( settings is {Interactive: true} || !string.IsNullOrWhiteSpace(settings.GetSites) ) {
 			CommandProcessor.Instance.ProcessSiteChoices(iisController, ref siteChoices);
 			if ( settings.GetSites?.ToLower() == @"getsites" ) {
-				CommandProcessor.Instance.GetSites(siteChoices);
+				return CommandProcessor.Instance.GetSites(siteChoices);
 			}
 
 			RunPrompts.ExecutePrompts(
