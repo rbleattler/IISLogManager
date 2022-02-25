@@ -7,6 +7,7 @@ on:
       - 'v*'
 
 env:
+  PROJECT_SLN: 'IISLogManager.sln' # Can I restore this instead of the csproj files?
   CORE_PROJECT_PATH: 'src/IISLogManager.Core/IISLogManager.Core.csproj'
   CLI_PROJECT_PATH: 'src/IISLogManager.CLI/IISLogManager.CLI.csproj'
   PACKAGE_OUTPUT_DIR: ${{ github.workspace }}\output
@@ -26,13 +27,15 @@ jobs:
       with:
         dotnet-version: 6.0.x
 
-    - name: Restore packages
+    - name: Restore Core package
       run: dotnet restore ${{ env.CORE_PROJECT_PATH }}
+    
+    - name: Restore CLI package
+      run: dotnet restore ${{ env.CLI_PROJECT_PATH }}
 
     - name: Get Version
       id: version
       uses: battila7/get-version-action@v2
- 
 
     - name: Build packages
       run: dotnet build ${{ env.CORE_PROJECT_PATH }} --no-restore --configuration Release -p:Version=${{ steps.version.outputs.version-without-v }}
