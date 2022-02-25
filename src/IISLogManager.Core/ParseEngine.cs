@@ -25,7 +25,7 @@ namespace IISLogManager.Core {
 
 		public ParseEngine(string filePath) {
 			if ( !File.Exists(filePath) ) {
-				throw new Exception($"Could not find File {filePath}");
+				throw new($"Could not find File {filePath}");
 			}
 
 			FilePath = filePath;
@@ -43,7 +43,7 @@ namespace IISLogManager.Core {
 		}
 
 		private IEnumerable<IISLogObject> QuickProcess() {
-			IISLogObjectCollection logs = new IISLogObjectCollection();
+			IISLogObjectCollection logs = new();
 			var lines = Utils.ReadAllLines(FilePath);
 			foreach (string line in lines) {
 				ProcessLine(line, logs);
@@ -54,10 +54,10 @@ namespace IISLogManager.Core {
 		}
 
 		private IEnumerable<IISLogObject> LongProcess() {
-			IISLogObjectCollection logs = new IISLogObjectCollection();
+			IISLogObjectCollection logs = new();
 			MissingRecords = false;
 			using (FileStream fileStream = File.Open(FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
-				using (StreamReader streamReader = new StreamReader(fileStream)) {
+				using (StreamReader streamReader = new(fileStream)) {
 					while (streamReader.Peek() > -1) {
 						ProcessLine(streamReader.ReadLine(), logs);
 						if ( logs?.Count > 0 && logs?.Count % MaxRecordsToProcess == 0 ) {

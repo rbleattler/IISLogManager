@@ -96,13 +96,16 @@ public class CommandProcessor {
 						ConnectionManager connectionManager = new();
 						connectionManager.SetConnection(config.OutputUri);
 						if ( config.AuthMode == AuthMode.BearerToken ) {
-							if ( config.AuthToken != null )
-								connectionManager.SetConnection(config.OutputUri, config.AuthToken);
+							if ( config.AuthToken != null ) connectionManager.BearerToken = config.AuthToken;
+							connectionManager.SetConnection(
+								config.OutputUri,
+								connectionManager.BearerToken ?? throw new NullAuthTokenException()
+							);
 						}
 
-						//TODO: Chunk processing
-						//TODO: Is returning 401/400, need to work on this
 						var response = connectionManager.AddLogs(site.Logs, site.SiteUrl, site.SiteName, site.HostName);
+						// var response = connectionManager.AddLogs(site.Logs, site.SiteUrl, site.SiteName, site.HostName,
+						// 	true);
 						AnsiConsole.MarkupLine($"[DarkOrange]Server Response :[/]{response}");
 					}
 
