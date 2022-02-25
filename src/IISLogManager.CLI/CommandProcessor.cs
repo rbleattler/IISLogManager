@@ -103,9 +103,9 @@ public class CommandProcessor {
 							);
 						}
 
-						//TODO: Chunk processing
-						//TODO: Is returning 401/400, need to work on this
 						var response = connectionManager.AddLogs(site.Logs, site.SiteUrl, site.SiteName, site.HostName);
+						// var response = connectionManager.AddLogs(site.Logs, site.SiteUrl, site.SiteName, site.HostName,
+						// 	true);
 						AnsiConsole.MarkupLine($"[DarkOrange]Server Response :[/]{response}");
 					}
 
