@@ -29,19 +29,9 @@ namespace IISLogManager.Core {
 			var targetDirectory = Path.GetDirectoryName(filePath);
 			if ( !Directory.Exists(targetDirectory) ) Directory.CreateDirectory(targetDirectory!);
 			if ( File.Exists(filePath) ) File.Create(filePath);
-			File.WriteAllBytes(filePath, byteLogs);
+			File.WriteAllBytes(filePath,
+				byteLogs ?? throw new NullReferenceException("WriteToFile : byteLogs was null"));
 		}
-
-		public List<string>? ToStringCollection() {
-			var list = new List<string>();
-			if ( !this.Any() ) return null;
-			foreach (var site in this) {
-				list.Add(site.ToJson());
-			}
-
-			return list;
-		}
-
 
 		//TODO: Fix ToJson()
 		//I know there is a better way to do this... I just don't have the bandwidth at the moment... 
@@ -52,15 +42,15 @@ namespace IISLogManager.Core {
 			StringBuilder stringBuilder = new();
 			stringBuilder.AppendLine("{");
 			if ( null != siteName ) {
-				stringBuilder.AppendLine($"\"SiteName\" : \"{siteName}\"");
+				stringBuilder.AppendLine($"\"SiteName\" : \"{siteName}\",");
 			}
 
 			if ( null != siteUrl ) {
-				stringBuilder.AppendLine($"\"SiteUrl\" : \"{siteUrl}\"");
+				stringBuilder.AppendLine($"\"SiteUrl\" : \"{siteUrl}\",");
 			}
 
 			if ( null != hostName ) {
-				stringBuilder.AppendLine($"\"HostName\" : \"{hostName}\"");
+				stringBuilder.AppendLine($"\"HostName\" : \"{hostName}\",");
 			}
 
 			stringBuilder.AppendLine("\"Logs\":[");
@@ -84,14 +74,9 @@ namespace IISLogManager.Core {
 		}
 
 		public void FilterLogs(DateTime startDate, DateTime endDate) {
-			var filteredLogs = this.Where(l => { return l.LogDateTime >= startDate && l.LogDateTime <= endDate; });
+			var filteredLogs = this.Where(l => l.LogDateTime >= startDate && l.LogDateTime <= endDate);
 			RemoveAll(l => !filteredLogs.Contains(l));
 		}
-
-		// public byte[]? ToJsonByteArray() {
-		// 	// return Encoding.ASCII.GetBytes(ToJson());
-		// 	return ToJsonByteArray(null, null, null);
-		// }
 
 		public byte[]? ToJsonByteArray(string? siteUrl = null, string? siteName = null, string? hostName = null) {
 			var jsonOut = ToJson(siteUrl ?? null, siteName ?? null, hostName ?? null);
