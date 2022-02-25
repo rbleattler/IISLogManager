@@ -39,7 +39,7 @@ namespace IISLogManager.Core {
 		public void ParseLogs(string filePath) {
 			//Stopwatch stopwatch = Stopwatch.StartNew();
 			_logParser.FilePath = filePath;
-			Debug.WriteLine("Parsing" + filePath);
+			// Debug.WriteLine("Parsing" + filePath);
 			var parsedLogs = _logParser.ParseLog();
 			foreach (IISLogObject logObject in parsedLogs) {
 				Logs.Add(logObject);
@@ -68,7 +68,7 @@ namespace IISLogManager.Core {
 		}
 
 		public void CompressLog(IISLogObject log, bool removeFromLogs) {
-			Debug.WriteLine("Compressing" + log.UniqueId);
+			// Debug.WriteLine("Compressing" + log.UniqueId);
 			string jLog = log.ToJson();
 			string compressedLog = Utils.CompressString(jLog);
 			CompressedLogs.Add(compressedLog);
@@ -92,7 +92,7 @@ namespace IISLogManager.Core {
 		/// <param name="filePath"></param>
 		public void SaveLogs(string filePath) {
 			var file = File.Open(filePath, FileMode.OpenOrCreate);
-			StreamWriter stream = new StreamWriter(file);
+			StreamWriter stream = new(file);
 			var content = Logs.ToJson();
 			stream.Write(content);
 			stream.Close();

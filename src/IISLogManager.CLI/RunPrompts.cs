@@ -70,7 +70,7 @@ public class RunPrompts {
 
 
 	public static TextPrompt<string> OutUriPrompt =
-		new TextPrompt<string>("Enter the remote endpoint URI (including protocol & port if necessary)");
+		new("Enter the remote endpoint URI (including protocol & port if necessary)");
 
 	public static ConfirmationPrompt ConfirmContinuePrompt = new("Ready to continue?");
 

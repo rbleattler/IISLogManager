@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text;
 
 namespace IISLogManager.Core {
@@ -14,9 +13,9 @@ namespace IISLogManager.Core {
 		/// <param name="file"></param>
 		/// <returns>List<string></returns>
 		public static List<string> ReadAllLines(string file) {
-			List<string> lines = new List<string>();
+			List<string> lines = new();
 			using (FileStream fileStream = File.Open(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
-				using (StreamReader streamReader = new StreamReader(fileStream)) {
+				using (StreamReader streamReader = new(fileStream)) {
 					while (streamReader.Peek() > -1) {
 						lines.Add(streamReader.ReadLine());
 					}
@@ -141,8 +140,8 @@ namespace IISLogManager.Core {
 		public static string ExtractUrl(string complexValue) {
 			var splitString = complexValue.Split('\t');
 			if ( splitString[1] != "()" ) {
-				return splitString[1].Replace('(', new char())
-					.Replace(')', new char())
+				return splitString[1].Replace('(', new())
+					.Replace(')', new())
 					.Trim();
 			}
 

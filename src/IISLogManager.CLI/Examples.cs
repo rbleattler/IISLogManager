@@ -4,7 +4,7 @@ namespace IISLogManager.CLI;
 
 public class Examples {
 	private Examples() { }
-	public static Examples Instance { get; } = new Examples();
+	public static Examples Instance { get; } = new();
 
 	public List<string> GetExamples() {
 		var ex4 = new StringBuilder();

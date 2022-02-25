@@ -16,8 +16,8 @@ class GetIISLogsCommand : Command<Settings> {
 		string? fromDate = settings.FromDate;
 		string? toDate = settings.ToDate;
 		FilterConfiguration filterConfiguration =
-			new FilterConfiguration(
-				filterState: filter,
+			new(
+				filter,
 				fromDate == null ? DateTime.Today.AddYears(-5) : DateTime.Parse(fromDate),
 				toDate == null ? DateTime.Today : DateTime.Parse(toDate)
 			);
