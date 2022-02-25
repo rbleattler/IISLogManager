@@ -1,54 +1,62 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace IISLogManager.Core;
 
 public class ConnectionManager {
-	private static HttpClientHandler _netClientHandler = new() {
-		//TODO: Add support for sending with non-default credentials
-		UseDefaultCredentials = true
-	};
+	// private static HttpClientHandler _netClientHandler = new() {
+	// 	//TODO: Add support for sending with non-default credentials
+	// 	UseDefaultCredentials = true
+	// };
 
-	private HttpClient _netClient = new(_netClientHandler);
+	// private HttpClient _netClient = new(_netClientHandler);
+	private readonly HttpClientHandler _clientHandler = new();
 
+	private  HttpClient _netClient;
 	public Uri? Uri { get; set; }
-
 	public string? UriString { get; private set; }
-
 	public string? BearerToken { get; set; }
+	private readonly Dictionary<Guid, HttpStatusCode> _responseCodes = new();
 
+	public void SetConnection(string uri, string? authToken = null, int timeOut = 30,
+		NetworkCredential? credential = null, bool? useDefaultCredential = true) {
+		if ( null != credential ) {
+			_clientHandler.Credentials = credential;
+		}
 
-	public void SetConnection(string uri) {
+		if ( true == useDefaultCredential ) {
+			_clientHandler.UseDefaultCredentials = true;
+		}
+
+		_netClient = new HttpClient(_clientHandler);
 		//TODO: Set other defaults?
 		SetUri(uri);
+		if ( !string.IsNullOrWhiteSpace(authToken) && null != authToken ) {
+			SetAuthToken(authToken);
+		}
+
 		_netClient
 			.DefaultRequestHeaders
 			.Accept
-			.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-		_netClient
-			.DefaultRequestHeaders
-			.Add("accept", "application/json");
-	}
+			.Add(new("application/json"));
+		_netClient.MaxResponseContentBufferSize = 2147483647;
 
-	public void SetConnection(string uri, string authToken) {
-		//TODO: Set other defaults?
-		SetUri(uri);
-		SetAuthToken(authToken);
-		_netClient
-			.DefaultRequestHeaders
-			.Accept
-			.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-		_netClient
-			.DefaultRequestHeaders
-			.Add("accept", "application/json");
-		_netClient
-			.DefaultRequestHeaders
-			.Add("Authorization", "Bearer " + BearerToken);
+		if ( null != BearerToken ) {
+			_netClient
+				.DefaultRequestHeaders
+				.Add("Authorization", "Bearer " + BearerToken);
+		}
+
+		_netClient.Timeout = TimeSpan.FromSeconds(timeOut);
 	}
 
 	public HttpStatusCode AddLog(IISLogObject log) {
@@ -61,25 +69,83 @@ public class ConnectionManager {
 		return postRequest.Result.StatusCode;
 	}
 
-	public HttpStatusCode AddLogs(IISLogObjectCollection logs, string? siteUrl = null,
+	async Task<Guid> SubmitLogs(
+		IISLogObjectCollection logs,
+		string? siteUrl = null,
 		string? siteName = null,
-		string? hostName = null) {
-		var byteLogs = logs.ToJsonByteArray(siteUrl, siteName, hostName);
-		//TODO: URGENT Mirror C:\Repos\IISLogManager\IISLogManager\Public\Compress-Data.ps1
-		//TODO: var byteLogsMbSize = byteLogs?.Length / 1024 / 1024;
-		//TODO: Stream if bytelogsMbSize > *some target size*
-		var postRequest = _netClient.PostAsync(
-			requestUri: Uri,
-			content: new ByteArrayContent(byteLogs),
-			CancellationToken.None //TODO: CancellationTokens
-		);
-		postRequest.Wait();
-		return postRequest.Result.StatusCode;
-		//TODO: StatusCode Error Handler 
+		string? hostName = null
+	) {
+		var jLogs = logs.ToJson(siteUrl, siteName, hostName);
+		var compressedLogs = Utils.CompressString(jLogs);
+		var requestContent = $"{{\"RawContent\" : \"{compressedLogs}\"}}";
+		Guid taskGuid = Guid.NewGuid();
+		var httpResponse =
+			await SendRequestAsync(Uri?.ToString() ?? throw new InvalidOperationException(), requestContent);
+		_responseCodes.Add(taskGuid, httpResponse.StatusCode);
+		return taskGuid;
+	}
+
+	private HttpStatusCode ChunkSubmit(
+		IISLogObjectCollection logs,
+		string? siteUrl = null,
+		string? siteName = null,
+		string? hostName = null
+	) {
+		var startIndex = 0;
+		var reqCount = 0;
+
+		while (startIndex < logs.Count()) {
+			var logCount = logs.Count() - startIndex;
+			if ( logs.Count() - startIndex > 3500 ) {
+				logCount = 3500;
+			}
+
+			IISLogObjectCollection logChunk = new(logs.GetRange(startIndex, logCount));
+			SubmitLogs(logChunk, siteUrl, siteName, hostName).Wait();
+			startIndex += logCount;
+			reqCount++;
+		}
+
+		WaitResponseTimer(_netClient.Timeout.Milliseconds, reqCount);
+
+		if ( _responseCodes.ContainsValue(HttpStatusCode.Unauthorized) ) {
+			throw new HttpRequestException("One or more Requests returned : 401 Not Authorized");
+		}
+
+		return HttpStatusCode.OK;
+	}
+
+	public HttpStatusCode AddLogs(
+		IISLogObjectCollection logs,
+		string? siteUrl = null,
+		string? siteName = null,
+		string? hostName = null,
+		bool? chunkIfHeavy = true
+	) {
+		if ( true != chunkIfHeavy || logs.Count() < 3500 ) {
+			Console.WriteLine("[DEBUG] ChunkIfHeavy Disabled!");
+			SubmitLogs(logs, siteUrl, siteName, hostName).Wait();
+			WaitResponseTimer(_netClient.Timeout.Milliseconds, 1);
+		}
+
+		Console.WriteLine("[DEBUG] ChunkIfHeavy Enabled!");
+		return ChunkSubmit(logs, siteUrl, siteName, hostName);
+	}
+
+	private void WaitResponseTimer(int milliseconds, int requestCount) {
+		var timeOutTimer = 250;
+		while (_responseCodes.Count < requestCount) {
+			Thread.Sleep(250);
+			timeOutTimer += 250;
+			if ( timeOutTimer > milliseconds ) {
+				throw new HttpRequestException(
+					$"Http requests failed due to timeout ({_netClient.Timeout.Seconds} seconds)");
+			}
+		}
 	}
 
 	private void SetUri(string uri) {
-		Uri = new Uri(uri);
+		Uri = new(uri);
 		UriString = Uri.ToString();
 	}
 
@@ -93,7 +159,27 @@ public class ConnectionManager {
 		SetConnection(uri);
 	}
 
-	public ConnectionManager(string uri, string authToken) {
-		SetConnection(uri, authToken);
+	public ConnectionManager(string uri, string? authToken, int timeOut = 30) {
+		SetConnection(uri, authToken, timeOut);
+	}
+
+	private async Task<HttpResponseMessage> SendRequestAsync(string adaptiveUri, string resquestContent) {
+		var httpClient = _netClient;
+		// StringContent httpContent = new StringContent(resquestContent, Encoding.UTF8);
+		StringContent httpContent = new(resquestContent);
+
+		HttpResponseMessage responseMessage = null!;
+		try {
+			responseMessage = await httpClient.PostAsync(adaptiveUri, httpContent);
+		} catch (Exception ex) {
+			if ( responseMessage == null ) {
+				responseMessage = new();
+			}
+
+			responseMessage.StatusCode = HttpStatusCode.InternalServerError;
+			responseMessage.ReasonPhrase = $"RestHttpClient.SendRequest failed: {ex}";
+		}
+
+		return responseMessage;
 	}
 }
