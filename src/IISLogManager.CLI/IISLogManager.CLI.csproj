@@ -1,41 +1,53 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<OutputType>Exe</OutputType>
-		<TargetFramework>net6.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<NeutralLanguage>en-US</NeutralLanguage>
-		<SelfContained>true</SelfContained>
-		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
-	</PropertyGroup>
-	<ItemGroup>
-		<Compile Remove="scratch\**" />
-		<EmbeddedResource Remove="scratch\**" />
-		<None Remove="scratch\**" />
-		<Compile Remove="Fascia.cs" />
-	</ItemGroup>
-	<ItemGroup>
-		<!-- 
-			The redundant Packages (multiple versions) are here because without specifying each of them the package fails to work properly on certain older systems 
-		-->
-		<PackageReference Include="CommandLineParser" Version="2.8.0" />
-		<PackageReference Include="FluentAssertions" Version="6.4.0" />
-		<PackageReference Include="Microsoft.Web.Administration" Version="11.1.0">
-			<PrivateAssets>all</PrivateAssets>
-		</PackageReference>
-		<PackageReference Include="Newtonsoft.Json" Version="12.0.1">
-			<PrivateAssets>all</PrivateAssets>
-		</PackageReference>
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.0" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-		<PackageReference Include="Sharprompt" Version="2.4.0" />
-		<PackageReference Include="Spectre.Console" Version="0.43.1-preview.0.24" />
-	</ItemGroup>
-	<ItemGroup>
-		<None Remove="Program.cs.bak" />
-	</ItemGroup>
-	<ItemGroup>
-		<ProjectReference Include="..\IISLogManager.Core\IISLogManager.Core.csproj" />
-	</ItemGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <NeutralLanguage>en-US</NeutralLanguage>
+        <SelfContained>true</SelfContained>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+        <!--         Package Info -->
+        <Authors>Robert Bleattler</Authors>
+        <PackageId>IISLogManager.CLI</PackageId>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <AssemblyName>IISLogManager.CLI</AssemblyName>
+        <DefaultNamespace>IISLogManager.CLI</DefaultNamespace>
+        <Title>IISLogManager.CLI</Title>
+        <Description>A command line application for managing IIS Logs</Description>
+        <Copyright>Robert Bleattler</Copyright>
+        <PackageProjectUrl>https://github.com/rbleattler/IISLogManager</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/rbleattler/IISLogManager/blob/main/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/rbleattler/IISLogManager</RepositoryUrl>
+        <PackageTags>IIS, Logs, Log Management, Web Logs, W3C, EXE, bin</PackageTags>
+        <!-- End Package Info -->
+    </PropertyGroup>
+    <ItemGroup>
+        <Compile Remove="scratch\**"/>
+        <EmbeddedResource Remove="scratch\**"/>
+        <None Remove="scratch\**"/>
+    </ItemGroup>
+    <ItemGroup>
+        <!-- 
+            The redundant Packages (multiple versions) are here because without specifying each of them the package fails to work properly on certain older systems 
+        -->
+        <PackageReference Include="CommandLineParser" Version="2.8.0"/>
+        <PackageReference Include="FluentAssertions" Version="6.4.0"/>
+        <PackageReference Include="Microsoft.Web.Administration" Version="11.1.0">
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.1">
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.0"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
+        <PackageReference Include="Sharprompt" Version="2.4.0"/>
+        <PackageReference Include="Spectre.Console" Version="0.43.1-preview.0.24"/>
+    </ItemGroup>
+    <ItemGroup>
+        <None Remove="Program.cs.bak"/>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\IISLogManager.Core\IISLogManager.Core.csproj"/>
+    </ItemGroup>
 </Project>
