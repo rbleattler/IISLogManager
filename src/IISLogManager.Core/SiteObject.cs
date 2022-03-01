@@ -1,6 +1,4 @@
-using System;
 using System.Diagnostics;
-using System.IO;
 using Microsoft.Web.Administration;
 
 
@@ -15,25 +13,32 @@ namespace IISLogManager.Core {
 		public string LogRoot;
 		public string IntrinsicLogRoot;
 		public LogFormat LogFormat;
-		public string[] LogFilePaths;
+		public List<string> LogFilePaths;
 		public IISLogObjectCollection Logs = new();
 
-		public System.Collections.Generic.List<string> CompressedLogs = new();
-
-		//TODO: Filter Logs
-		// private bool LogsParsed = false;
-		// private string ParsedLogsPath;
+		public List<string> CompressedLogs = new();
 		private ParseEngine _logParser = new();
 
 		public void ParseAllLogs() {
-			Stopwatch stopwatch = Stopwatch.StartNew();
-			foreach (var logFile in LogFilePaths) {
-				ParseLogs(logFile);
+			var dirExists = Directory.Exists(IntrinsicLogRoot);
+			if ( dirExists ) {
+				Stopwatch stopwatch = Stopwatch.StartNew();
+				foreach (var logFile in LogFilePaths) {
+					if ( !File.Exists(logFile) ) {
+						Console.WriteLine($"{logFile} does not exist...");
+						continue;
+					}
+
+					ParseLogs(logFile);
+				}
+
+				stopwatch.Stop();
+				Console.WriteLine($"processed {Logs.Count} logs in {stopwatch.Elapsed}");
+				GC.Collect();
 			}
 
-			stopwatch.Stop();
-			Console.WriteLine($"processed {Logs.Count} logs in {stopwatch.Elapsed}");
-			GC.Collect();
+			if ( !dirExists )
+				Console.WriteLine($"The log root {IntrinsicLogRoot} does not exist. Skipped site logs...");
 		}
 
 		public void ParseLogs(string filePath) {
@@ -77,6 +82,20 @@ namespace IISLogManager.Core {
 			}
 		}
 
+		//region Filter Log Paths
+		public void FilterLogFiles(DateTime startDate, DateTime endDate) {
+			var filteredLogFiles = this.LogFilePaths.Where(l => {
+				var info = new FileInfo(l);
+				// Console.WriteLine("LastWriteTime : {0}", info.LastWriteTime);
+				// Console.WriteLine("StartDate : {0}", startDate);
+				// Console.WriteLine("EndDate : {0}", endDate);
+				// Console.WriteLine($">= StartDate : {info.LastWriteTime.Ticks >= startDate.Ticks}");
+				// Console.WriteLine($"<= EndDate : {info.LastWriteTime.Ticks <= endDate.Ticks}");
+				return info.LastWriteTime.Ticks >= startDate.Ticks && info.LastWriteTime.Ticks <= endDate.Ticks;
+			});
+			LogFilePaths.RemoveAll(path => !filteredLogFiles.Contains(path));
+		}
+		//endregion Filter Log paths
 
 		// TODO: Explore this?
 		// public void ParallelParseLogs(string filePath) {
