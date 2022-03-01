@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-
-namespace IISLogManager.Core {
+﻿namespace IISLogManager.Core {
 	public class ParseEngine : IDisposable {
 		public string FilePath {
 			get { return _filePath; }

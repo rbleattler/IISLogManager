@@ -34,8 +34,13 @@ class GetIISLogsCommand : Command<Settings> {
 		if ( settings is {Interactive: true} || !string.IsNullOrWhiteSpace(settings.GetSites) ) {
 			CommandProcessor.Instance.ProcessSiteChoices(iisController, ref siteChoices);
 			if ( settings.GetSites?.ToLower() == @"getsites" ) {
+				if ( settings.Id?.ToLower() == @"id" ) {
+					return CommandProcessor.Instance.GetSiteIds(ref iisController);
+				}
+
 				return CommandProcessor.Instance.GetSites(siteChoices);
 			}
+
 
 			RunPrompts.ExecutePrompts(
 				runMode: ref runMode,
@@ -53,16 +58,17 @@ class GetIISLogsCommand : Command<Settings> {
 
 		AnsiConsole.MarkupLine($"[DarkOrange]Run mode[/]: {runMode}");
 		AnsiConsole.MarkupLine($"[DarkOrange]Output Mode[/] : {outputMode}");
-		if ( outputMode == OutputMode.Local ) {
-			AnsiConsole.MarkupLine($"[DarkOrange]Output Directory[/] : {outputDirectory}");
-		}
-
-		if ( outputMode == OutputMode.Remote ) {
-			AnsiConsole.MarkupLine($"[DarkOrange]Output URI[/] : {outputUri}");
+		switch (outputMode) {
+			case OutputMode.Local:
+				AnsiConsole.MarkupLine($"[DarkOrange]Output Directory[/] : {outputDirectory}");
+				break;
+			case OutputMode.Remote:
+				AnsiConsole.MarkupLine($"[DarkOrange]Output URI[/] : {outputUri}");
+				break;
 		}
 
 		AnsiConsole.MarkupLine($"[DarkOrange]Target Sites[/] :");
-		int i = 0;
+		var i = 0;
 		targetSites?.ForEach(ts => {
 			i++;
 			AnsiConsole.MarkupLine($"[Blue]{i} : {ts.SiteName} ({ts.SiteUrl})[/]");

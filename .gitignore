@@ -2,7 +2,7 @@
 #/CS
 /.vs
 **/.idea
-*.nuspec
+#*.nuspec
 
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 .DS_Store
@@ -165,7 +165,7 @@ publish/
 PublishScripts/
 
 # Nuspec Files
-*.nuspec
+#*.nuspec
 # NuGet Packages
 *.nupkg
 # The packages folder can be ignored because of Package Restore

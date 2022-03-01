@@ -1,4 +1,5 @@
 ﻿using IISLogManager.Core;
+using System.Text;
 using Spectre.Console;
 
 namespace IISLogManager.CLI;
@@ -56,27 +57,52 @@ public class CommandProcessor {
 		return 0;
 	}
 
+	public int GetSiteIds(ref IISController iiSController) {
+		AnsiConsole.MarkupLine("[DarkOrange]Site Ids[/]");
+		iiSController.Sites.ForEach(s => { AnsiConsole.MarkupLine($"{s.Id}"); });
+		return 0;
+	}
+
 	//TODO: Ensure there *ARE* logs to process before beginning processing... 
 	public void ProcessLogs(ref CommandConfiguration config) {
 		//TODO: Add verbose output
 		// AnsiConsole.MarkupLine("[[DEBUG]]  Checking if TargetSites is null...");
 		if ( config.TargetSites != null ) {
 			// AnsiConsole.MarkupLine("[[DEBUG]] TargetSites is not null...");
+			if ( config.Settings != null && config.Settings.Filter ) {
+				int pathCount = 0;
+#if DEBUG
+				config.TargetSites.ForEach(p => pathCount += p.LogFilePaths.Count);
+				AnsiConsole.MarkupLine($"[[DEBUG]] Filtering enabled...");
+				AnsiConsole.MarkupLine($"[[DEBUG]] FromDate : {config.Settings.FromDate} ...");
+				AnsiConsole.MarkupLine($"[[DEBUG]] ToDate : {config.Settings.ToDate} ...");
+				AnsiConsole.MarkupLine($"[[DEBUG]] Filtering Files... ( Count : {pathCount})");
+				pathCount = 0;
+#endif
+				config.TargetSites.FilterAllLogFiles(
+					DateTime.Parse(config.Settings.FromDate),
+					DateTime.Parse(config.Settings.ToDate)
+				);
+				config.TargetSites.ForEach(p => pathCount += p.LogFilePaths.Count);
+				AnsiConsole.MarkupLine(
+					$"[[DEBUG]] Finished Filtering Files... (New Count : {pathCount})");
+			}
+
 			foreach (var site in config.TargetSites) {
 				AnsiConsole.MarkupLine($"[[DEBUG]] Processing {site.SiteName}...");
 				site.ParseAllLogs();
 				if ( site.Logs.Count <= 0 ) {
 					AnsiConsole.MarkupLine($"[DarkOrange]{site.SiteName}[/] has no logs from the target date range...");
-					break;
+					continue;
 				}
 
 				if ( config.Settings != null && config.Settings.Filter ) {
-					AnsiConsole.MarkupLine($"[[DEBUG]] Filtering enabled...");
-
+					AnsiConsole.MarkupLine($"[[DEBUG]] Filtering Logs... ( Count : {site.Logs.Count})");
 					site.Logs.FilterLogs(
 						DateTime.Parse(config.Settings.FromDate!),
 						DateTime.Parse(config.Settings.ToDate!)
 					);
+					AnsiConsole.MarkupLine($"[[DEBUG]] Filtering Logs... ( New Count : {site.Logs.Count})");
 				}
 
 				if ( config.OutputMode == OutputMode.Local ) {

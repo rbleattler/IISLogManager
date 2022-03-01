@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
@@ -13,6 +14,10 @@ public class Settings : CommandSettings {
 	[CommandArgument(0, "[GetSites]")]
 	[Description("Lists all websites [DarkOrange]Name[/][Blue] (Url)[/]")]
 	public string? GetSites { get; set; }
+
+	[CommandArgument(1, "[Id]")]
+	[Description("Lists all website Ids [DarkOrange]GetSites Id[/]")]
+	public string? Id { get; set; }
 
 	[Description("Interactive Mode.\t\t[red]NOTE [/]:\tDISABLES ALL OTHER COMMAND LINE OPTIONS")]
 	[DefaultValue(false)]

@@ -1,14 +1,6 @@
 ﻿#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Security;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace IISLogManager.Core;
 
@@ -24,6 +16,9 @@ public class ConnectionManager {
 	private  HttpClient _netClient;
 	public Uri? Uri { get; set; }
 	public string? UriString { get; private set; }
+
+	public int LogChunkSize { get; set; } = 25000;
+
 	public string? BearerToken { get; set; }
 	private readonly Dictionary<Guid, HttpStatusCode> _responseCodes = new();
 
@@ -96,8 +91,8 @@ public class ConnectionManager {
 
 		while (startIndex < logs.Count()) {
 			var logCount = logs.Count() - startIndex;
-			if ( logs.Count() - startIndex > 3500 ) {
-				logCount = 3500;
+			if ( logs.Count() - startIndex > LogChunkSize ) {
+				logCount = LogChunkSize;
 			}
 
 			IISLogObjectCollection logChunk = new(logs.GetRange(startIndex, logCount));
@@ -122,7 +117,7 @@ public class ConnectionManager {
 		string? hostName = null,
 		bool? chunkIfHeavy = true
 	) {
-		if ( true != chunkIfHeavy || logs.Count() < 3500 ) {
+		if ( true != chunkIfHeavy || logs.Count() < LogChunkSize ) {
 			Console.WriteLine("[DEBUG] ChunkIfHeavy Disabled!");
 			SubmitLogs(logs, siteUrl, siteName, hostName).Wait();
 			WaitResponseTimer(_netClient.Timeout.Milliseconds, 1);
@@ -177,7 +172,8 @@ public class ConnectionManager {
 			}
 
 			responseMessage.StatusCode = HttpStatusCode.InternalServerError;
-			responseMessage.ReasonPhrase = $"RestHttpClient.SendRequest failed: {ex}";
+			var reason = ex.Message ?? "No Reason Provided";
+			responseMessage.ReasonPhrase = $"RestHttpClient.SendRequest failed: {reason}";
 		}
 
 		return responseMessage;
