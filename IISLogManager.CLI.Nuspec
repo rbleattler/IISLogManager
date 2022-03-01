@@ -5,11 +5,11 @@
         <version>0.0.0</version>
         <authors>Robert Bleattler</authors>
         <owners>Robert Bleattler</owners>
-        <requireLicenseAcceptance>true</requireLicenseAcceptance>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>A command line application for managing IIS Logs</description>
         <summary>A command line application for managing IIS Logs</summary>
     </metadata>
     <files>
-        <file src="src\IISLogManager.Cli\bin\Release\win-x64\*.*" exclude="*scratch*" />
+        <file src="src\IISLogManager.CLI\**\win-x64\*.*" exclude="*scratch*" />
     </files>
 </package>
