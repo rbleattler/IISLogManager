@@ -15,4 +15,8 @@ public class SiteObjectCollection : List<SiteObject>, IComparable<IISLogObjectCo
 	public void ParseAllLogs() {
 		ForEach(s => s.ParseAllLogs());
 	}
+
+	public void FilterAllLogFiles(DateTime startDate, DateTime endDate) {
+		ForEach(s => s.FilterLogFiles(startDate, endDate));
+	}
 }
