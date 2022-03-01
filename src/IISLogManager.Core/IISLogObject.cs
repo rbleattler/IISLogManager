@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace IISLogManager.Core;
 
@@ -117,7 +115,6 @@ public class IISLogObject : MPropertyAsStringSettable {
 	// 		}
 	// 	}
 	// }
-
 	public string ToJson() {
 		string serializedObject = JsonConvert.SerializeObject(this, Formatting.None);
 		return serializedObject;

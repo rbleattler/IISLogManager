@@ -28,7 +28,7 @@ public class RunPrompts {
 	public static TextPrompt<string?> OutDirectoryPrompt =
 		new TextPrompt<string?>("Where do you want to save the file?")
 			.DefaultValue(
-				$"{Environment.GetEnvironmentVariable("USERPROFILE")}\\IISLogManager\\{DateTime.Now.ToString("yyyy-MM-dd")}"
+				$"{Environment.GetEnvironmentVariable("USERPROFILE")}\\IISLogManager\\{DateTime.Now:yyyy-MM-dd}"
 			);
 
 	public static SelectionPrompt<string> FilterPrompt =
@@ -128,7 +128,7 @@ public class RunPrompts {
 					var lwt = File.GetLastWriteTime(path);
 					return lwt > fromDate && lwt < toDate;
 				});
-				site.LogFilePaths = filteredPaths.ToArray();
+				site.LogFilePaths = filteredPaths.ToList();
 			}
 		}
 	}

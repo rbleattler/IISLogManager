@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace IISLogManager.Core;
+﻿namespace IISLogManager.Core;
 
 /// <inheritdoc />
 public class UriNotSpecifiedException : Exception {
