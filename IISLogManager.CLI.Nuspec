@@ -5,7 +5,7 @@
         <version>0.0.0</version>
         <authors>Robert Bleattler</authors>
         <owners>Robert Bleattler</owners>
-        <requireLicenseAcceptance>true</requireLicenseAcceptance>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>A command line application for managing IIS Logs</description>
         <summary>A command line application for managing IIS Logs</summary>
     </metadata>
