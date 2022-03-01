@@ -3,7 +3,7 @@
 /.vs
 **/.idea
 #*.nuspec
-
+**dotsettings**
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 .DS_Store
 CHECKLIST.md
