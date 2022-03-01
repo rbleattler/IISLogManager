@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <SelfContained>true</SelfContained>
         <!--Package Info-->
         <Authors>Robert Bleattler</Authors>
         <PackageId>IISLogManager.Core</PackageId>
-        <!--        <PackageVersion>0.0.1-beta-1</PackageVersion>-->
-        <!--        <Version>0.0.1-beta-1</Version>-->
-        <!---->
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <AssemblyName>IISLogManager.Core</AssemblyName>
         <DefaultNamespace>IISLogManager.Core</DefaultNamespace>
@@ -21,9 +21,9 @@
         <PackageTags>IIS, Logs, Log Management, Web Logs, W3C</PackageTags>
     </PropertyGroup>
     <ItemGroup>
-        <Compile Remove="scratch\**" />
-        <EmbeddedResource Remove="scratch\**" />
-        <None Remove="scratch\**" />
+        <Compile Remove="scratch\**"/>
+        <EmbeddedResource Remove="scratch\**"/>
+        <None Remove="scratch\**"/>
     </ItemGroup>
     <ItemGroup>
         <!-- 
@@ -32,8 +32,8 @@
         <PackageReference Include="Newtonsoft.Json" Version="12.0.1">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.0" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.0"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
         <PackageReference Include="Microsoft.Web.Administration" Version="11.1.0">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>

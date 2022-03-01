@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>IISLogManager.CLI</id>
+        <version>0.0.0</version>
+        <authors>Robert Bleattler</authors>
+        <owners>Robert Bleattler</owners>
+        <requireLicenseAcceptance>true</requireLicenseAcceptance>
+        <description>A command line application for managing IIS Logs</description>
+        <summary>A command line application for managing IIS Logs</summary>
+    </metadata>
+    <files>
+        <file src="src\IISLogManager.Cli\bin\Release\win-x64\*.*" exclude="*scratch*" />
+    </files>
+</package>
