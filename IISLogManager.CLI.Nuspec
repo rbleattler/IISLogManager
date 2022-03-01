@@ -10,6 +10,6 @@
         <summary>A command line application for managing IIS Logs</summary>
     </metadata>
     <files>
-        <file src="src/IISLogManager.CLI/bin/Release/net6.0/win-x64/**.*"/>
+        <file src="src/IISLogManager.CLI/bin/Release/net6.0/win-x64/**.*" target=""/>
     </files>
 </package>
