@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
@@ -12,12 +13,27 @@ public class Settings : CommandSettings {
 	public static readonly string OneYearAgoTodayString = OneYearAgoToday.ToString();
 
 	[CommandArgument(0, "[GetSites]")]
-	[Description("Lists all websites [DarkOrange]Name[/][Blue] (Url)[/]")]
+	[Description("List all Websites\t\t[DarkOrange]Name[/][Blue] (Url)[/]")]
 	public string? GetSites { get; set; }
 
 	[CommandArgument(1, "[Id]")]
-	[Description("Lists all website Ids [DarkOrange]GetSites Id[/]")]
+	[Description("Lists all Website Ids\t\t[DarkOrange]GetSites Id[/]")]
 	public string? Id { get; set; }
+
+	// TODO: Implement Getting Other Info About Sites
+	// [CommandArgument(1, "[LogRoot]")]
+	// [Description("Lists all Website Log Path Roots\t\t[DarkOrange]GetSites logroot[/]")]
+	// public string? LogRoot { get; set; }	
+	//
+	// [CommandArgument(1, "[Id]")]
+	// [Description("Lists all Website LogPaths\t\t[DarkOrange]GetSites Info SiteName/SiteUrl[/]")]
+	// public string? Info { get; set; }
+	//
+	// [CommandArgument(2, "[Id]")]
+	// [Description("Target Site\t\t[DarkOrange]Name or Url[/]")]
+	// public string? TargetSite { get; set; }
+	// 
+
 
 	[Description("Interactive Mode.\t\t[red]NOTE [/]:\tDISABLES ALL OTHER COMMAND LINE OPTIONS")]
 	[DefaultValue(false)]
@@ -76,6 +92,12 @@ public class Settings : CommandSettings {
 	// [DefaultValue(value: GetTodayString())]
 	public string? ToDate { get; set; }
 
+	[Description($"[DarkOrange]Ignore Default Web Site in Operation[/]\tDefault : true")]
+	[CommandOption("-z|--IgnoreDefaultSite")]
+	[DefaultValue(true)]
+	// [DefaultValue(value: GetTodayString())]
+	public bool IgnoreDefaultWebSite { get; set; }
+
 	public Settings() { }
 
 	public override ValidationResult Validate() {
@@ -88,3 +110,5 @@ public class Settings : CommandSettings {
 		return ValidationResult.Success();
 	}
 }
+
+// TODO: Rebuild using this method of settings construction : https://spectreconsole.net/cli/composing
