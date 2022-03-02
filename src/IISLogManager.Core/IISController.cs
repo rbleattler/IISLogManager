@@ -15,9 +15,11 @@ namespace IISLogManager.Core {
 		public void GetExtendedSiteList(bool ignoreDefaultSite = true) {
 			SiteCollection siteList = ServerManager.Sites;
 			foreach (Site site in siteList) {
-				if ( site.Name != "Default Web Site" ) {
-					Sites.Add(_siteObjectFactory.BuildSite(site));
+				if ( site.Name == "Default Web Site" && ignoreDefaultSite ) {
+					continue;
 				}
+
+				Sites.Add(_siteObjectFactory.BuildSite(site));
 			}
 		}
 
