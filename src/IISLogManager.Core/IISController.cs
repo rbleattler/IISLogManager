@@ -12,10 +12,12 @@ namespace IISLogManager.Core {
 		/// <summary> 
 		/// Convert the Microsoft.Web.Administration Sites found in ServerManager.Sites to SiteObjects
 		/// </summary>
-		public void GetExtendedSiteList() {
+		public void GetExtendedSiteList(bool ignoreDefaultSite = true) {
 			SiteCollection siteList = ServerManager.Sites;
 			foreach (Site site in siteList) {
-				Sites.Add(_siteObjectFactory.BuildSite(site));
+				if ( site.Name != "Default Web Site" ) {
+					Sites.Add(_siteObjectFactory.BuildSite(site));
+				}
 			}
 		}
 

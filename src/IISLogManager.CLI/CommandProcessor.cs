@@ -96,14 +96,15 @@ public class CommandProcessor {
 					continue;
 				}
 
-				if ( config.Settings != null && config.Settings.Filter ) {
-					AnsiConsole.MarkupLine($"[[DEBUG]] Filtering Logs... ( Count : {site.Logs.Count})");
-					site.Logs.FilterLogs(
-						DateTime.Parse(config.Settings.FromDate!),
-						DateTime.Parse(config.Settings.ToDate!)
-					);
-					AnsiConsole.MarkupLine($"[[DEBUG]] Filtering Logs... ( New Count : {site.Logs.Count})");
-				}
+				// TODO: Remove in favor of logfile filtering
+				// if ( config.Settings != null && config.Settings.Filter ) {
+				// 	AnsiConsole.MarkupLine($"[[DEBUG]] Filtering Logs... ( Count : {site.Logs.Count})");
+				// 	site.Logs.FilterLogs(
+				// 		DateTime.Parse(config.Settings.FromDate!),
+				// 		DateTime.Parse(config.Settings.ToDate!)
+				// 	);
+				// 	AnsiConsole.MarkupLine($"[[DEBUG]] Filtering Logs... ( New Count : {site.Logs.Count})");
+				// }
 
 				if ( config.OutputMode == OutputMode.Local ) {
 					AnsiConsole.MarkupLine($"[[DEBUG]] Output mode Local...");
