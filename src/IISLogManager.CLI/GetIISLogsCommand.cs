@@ -27,15 +27,20 @@ class GetIISLogsCommand : Command<Settings> {
 		var outputUri = settings.Uri;
 		var authMode = settings.AuthMode;
 		var authToken = settings.AuthToken;
+		var ignoreDefaultWebSite = settings.IgnoreDefaultWebSite;
 
 		List<string> siteChoices = new();
-		iisController.GetExtendedSiteList();
+		iisController.GetExtendedSiteList(ignoreDefaultWebSite);
 		CommandProcessor.Instance.ProcessTargetSites(ref targetSites, iisController, settings, ref runMode);
 		if ( settings is {Interactive: true} || !string.IsNullOrWhiteSpace(settings.GetSites) ) {
 			CommandProcessor.Instance.ProcessSiteChoices(iisController, ref siteChoices);
 			if ( settings.GetSites?.ToLower() == @"getsites" ) {
 				if ( settings.Id?.ToLower() == @"id" ) {
 					return CommandProcessor.Instance.GetSiteIds(ref iisController);
+				}
+
+				if ( settings.Id?.ToLower() == @"logroot" ) {
+					return CommandProcessor.Instance.GetSiteLogRoots(ref iisController);
 				}
 
 				return CommandProcessor.Instance.GetSites(siteChoices);
