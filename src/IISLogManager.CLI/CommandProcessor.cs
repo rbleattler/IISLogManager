@@ -63,6 +63,12 @@ public class CommandProcessor {
 		return 0;
 	}
 
+	public int GetSiteLogRoots(ref IISController iiSController) {
+		AnsiConsole.MarkupLine("[DarkOrange]Log Roots[/]");
+		iiSController.Sites.ForEach(s => { AnsiConsole.MarkupLine($"{s.LogRoot}"); });
+		return 0;
+	}
+
 	//TODO: Ensure there *ARE* logs to process before beginning processing... 
 	public void ProcessLogs(ref CommandConfiguration config) {
 		//TODO: Add verbose output
