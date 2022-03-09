@@ -19,7 +19,8 @@ class GetIISLogsCommand : Command<Settings> {
 			new(
 				filter,
 				fromDate == null ? DateTime.Today.AddYears(-5) : DateTime.Parse(fromDate),
-				toDate == null ? DateTime.Today : DateTime.Parse(toDate)
+				// Remove 1 second, to offset to 11:59:59 the day before, and add 1 day to set to end of the target day
+				toDate == null ? DateTime.Today : DateTime.Parse(toDate).AddSeconds(-1).AddDays(1)
 			);
 		RunMode? runMode = settings.Interactive ? null : settings.RunMode;
 		OutputMode? outputMode = settings.OutputMode;
@@ -35,11 +36,11 @@ class GetIISLogsCommand : Command<Settings> {
 		if ( settings is {Interactive: true} || !string.IsNullOrWhiteSpace(settings.GetSites) ) {
 			CommandProcessor.Instance.ProcessSiteChoices(iisController, ref siteChoices);
 			if ( settings.GetSites?.ToLower() == @"getsites" ) {
-				if ( settings.Id?.ToLower() == @"id" ) {
+				if ( settings.CommandArgument?.ToLower() == @"id" ) {
 					return CommandProcessor.Instance.GetSiteIds(ref iisController);
 				}
 
-				if ( settings.Id?.ToLower() == @"logroot" ) {
+				if ( settings.CommandArgument?.ToLower() == @"logroot" ) {
 					return CommandProcessor.Instance.GetSiteLogRoots(ref iisController);
 				}
 
