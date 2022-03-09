@@ -13,7 +13,7 @@ namespace IISLogManager.Core {
 			siteObject.LogFileData = site.LogFile;
 			siteObject.LogRoot = Environment.ExpandEnvironmentVariables(site.LogFile.Directory);
 			siteObject.IntrinsicLogRoot = $"{siteObject.LogRoot}\\W3SVC{site.Id}";
-			//TODO: Error handler for if there is *no log directory here*... maybe we should check to see if IIS is even installed?
+			//TODO: Check to see if IIS is even installed?
 			siteObject.LogFilePaths = Directory.Exists(siteObject.IntrinsicLogRoot)
 				? Directory.GetFiles(siteObject.IntrinsicLogRoot).ToList()
 				: new List<string>();
