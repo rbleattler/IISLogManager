@@ -99,7 +99,7 @@ class GetIISLogsCommand : Command<Settings> {
 			settings: settings
 		);
 
-		AnsiConsole.MarkupLine("[DarkOrange]Beginning Log Processsing...[/]");
+		AnsiConsole.MarkupLine("[DarkOrange]Beginning Log Processing...[/]");
 		CommandProcessor.Instance.ProcessLogs(ref commandConfiguration);
 		AnsiConsole.MarkupLine("[DarkOrange]Finished Processing Logs![/]");
 
