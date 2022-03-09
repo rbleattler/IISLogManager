@@ -19,7 +19,8 @@ class GetIISLogsCommand : Command<Settings> {
 			new(
 				filter,
 				fromDate == null ? DateTime.Today.AddYears(-5) : DateTime.Parse(fromDate),
-				toDate == null ? DateTime.Today : DateTime.Parse(toDate)
+				// Remove 1 second, to offset to 11:59:59 the day before, and add 1 day to set to end of the target day
+				toDate == null ? DateTime.Today : DateTime.Parse(toDate).AddSeconds(-1).AddDays(1)
 			);
 		RunMode? runMode = settings.Interactive ? null : settings.RunMode;
 		OutputMode? outputMode = settings.OutputMode;
@@ -27,15 +28,20 @@ class GetIISLogsCommand : Command<Settings> {
 		var outputUri = settings.Uri;
 		var authMode = settings.AuthMode;
 		var authToken = settings.AuthToken;
+		var ignoreDefaultWebSite = settings.IgnoreDefaultWebSite;
 
 		List<string> siteChoices = new();
-		iisController.GetExtendedSiteList();
+		iisController.GetExtendedSiteList(ignoreDefaultWebSite);
 		CommandProcessor.Instance.ProcessTargetSites(ref targetSites, iisController, settings, ref runMode);
 		if ( settings is {Interactive: true} || !string.IsNullOrWhiteSpace(settings.GetSites) ) {
 			CommandProcessor.Instance.ProcessSiteChoices(iisController, ref siteChoices);
 			if ( settings.GetSites?.ToLower() == @"getsites" ) {
-				if ( settings.Id?.ToLower() == @"id" ) {
+				if ( settings.CommandArgument?.ToLower() == @"id" ) {
 					return CommandProcessor.Instance.GetSiteIds(ref iisController);
+				}
+
+				if ( settings.CommandArgument?.ToLower() == @"logroot" ) {
+					return CommandProcessor.Instance.GetSiteLogRoots(ref iisController);
 				}
 
 				return CommandProcessor.Instance.GetSites(siteChoices);
@@ -93,7 +99,7 @@ class GetIISLogsCommand : Command<Settings> {
 			settings: settings
 		);
 
-		AnsiConsole.MarkupLine("[DarkOrange]Beginning Log Processsing...[/]");
+		AnsiConsole.MarkupLine("[DarkOrange]Beginning Log Processing...[/]");
 		CommandProcessor.Instance.ProcessLogs(ref commandConfiguration);
 		AnsiConsole.MarkupLine("[DarkOrange]Finished Processing Logs![/]");
 

@@ -63,7 +63,12 @@ public class CommandProcessor {
 		return 0;
 	}
 
-	//TODO: Ensure there *ARE* logs to process before beginning processing... 
+	public int GetSiteLogRoots(ref IISController iiSController) {
+		AnsiConsole.MarkupLine("[DarkOrange]Log Roots[/]");
+		iiSController.Sites.ForEach(s => { AnsiConsole.MarkupLine($"{s.LogRoot}"); });
+		return 0;
+	}
+
 	public void ProcessLogs(ref CommandConfiguration config) {
 		//TODO: Add verbose output
 		// AnsiConsole.MarkupLine("[[DEBUG]]  Checking if TargetSites is null...");
@@ -96,15 +101,6 @@ public class CommandProcessor {
 					continue;
 				}
 
-				if ( config.Settings != null && config.Settings.Filter ) {
-					AnsiConsole.MarkupLine($"[[DEBUG]] Filtering Logs... ( Count : {site.Logs.Count})");
-					site.Logs.FilterLogs(
-						DateTime.Parse(config.Settings.FromDate!),
-						DateTime.Parse(config.Settings.ToDate!)
-					);
-					AnsiConsole.MarkupLine($"[[DEBUG]] Filtering Logs... ( New Count : {site.Logs.Count})");
-				}
-
 				if ( config.OutputMode == OutputMode.Local ) {
 					AnsiConsole.MarkupLine($"[[DEBUG]] Output mode Local...");
 					var outFile = site.GetLogFileName(config.OutputDirectory);
@@ -134,9 +130,6 @@ public class CommandProcessor {
 						// 	true);
 						AnsiConsole.MarkupLine($"[DarkOrange]Server Response :[/]{response}");
 					}
-
-
-					//TODO: Process Logs for remote output
 				}
 			}
 		}

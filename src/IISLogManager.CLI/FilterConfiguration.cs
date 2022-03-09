@@ -10,7 +10,7 @@ public class FilterConfiguration {
 	public FilterConfiguration(FilterState filterState, DateTime fromDate, DateTime toDate) {
 		FilterState = filterState;
 		FromDate = fromDate;
-		ToDate = toDate;
+		ToDate = toDate.AddDays(1).AddSeconds(-1);
 	}
 
 	public void SetToDate(string dateString) {
