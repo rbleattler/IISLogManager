@@ -16,9 +16,9 @@ public class Settings : CommandSettings {
 	[Description("List all Websites\t\t[DarkOrange]Name[/][Blue] (Url)[/]")]
 	public string? GetSites { get; set; }
 
-	[CommandArgument(1, "[Id]")]
-	[Description("Lists all Website Ids\t\t[DarkOrange]GetSites Id[/]")]
-	public string? Id { get; set; }
+	[CommandArgument(1, "[CommandArgument]")]
+	[Description("Argument\t\t\t[DarkOrange]Id | LogRoot[/]")]
+	public string? CommandArgument { get; set; }
 
 	// TODO: Implement Getting Other Info About Sites
 	// [CommandArgument(1, "[LogRoot]")]
@@ -35,36 +35,36 @@ public class Settings : CommandSettings {
 	// 
 
 
-	[Description("Interactive Mode.\t\t[red]NOTE [/]:\tDISABLES ALL OTHER COMMAND LINE OPTIONS")]
+	[Description("[DarkOrange]Interactive Mode.[/]\t\t[red]NOTE [/]:\tDISABLES ALL OTHER COMMAND LINE OPTIONS")]
 	[DefaultValue(false)]
 	[CommandOption("-i|--interactive")]
 	public bool Interactive { get; set; }
 
-	[Description("Run Mode.\t\t\t[blue]All[/] sites / [blue]Target[/] sites")]
+	[Description("[DarkOrange]Run Mode.[/]\t\t\t[blue]All[/] sites / [blue]Target[/] sites")]
 	[CommandOption("-r|--runmode")]
 	[DefaultValue(CLI.RunMode.All)]
 	public RunMode? RunMode { get; set; }
 
-	[Description("[DarkOrange](-r Target)[/]\t\tSite [yellow]Names[/]")]
+	[Description("[DarkOrange](-r Target)[/]\t\t\tSite [yellow]Names[/]\t\'a.com,b.com\'")]
 	[CommandOption("-s|--sites")]
 	public string? SiteNames { get; set; }
 
-	[Description("[DarkOrange](-r Target)[/]\t\tSite [yellow]Urls[/]")]
+	[Description("[DarkOrange](-r Target)[/]\t\t\tSite [yellow]Urls[/]\t\'a.com,b.com\'")]
 	[CommandOption("-S|--Sites")]
 	public string? SiteUrls { get; set; }
 
-	[Description("Output Mode.\t\t[blue]Local[/] disk / [blue]Remote[/] endpoint")]
+	[Description("[DarkOrange]Output Mode.[/]\t\t\t[blue]Local[/] disk / [blue]Remote[/] endpoint")]
 	[CommandOption("-O|--OutputMode")]
 	[DefaultValue(CLI.OutputMode.Local)]
 	public OutputMode? OutputMode { get; set; }
 
 	[Description(
-		"Remote Authorization Mode. (-O Remote)\t\tUse [blue]DefaultCredentials[/] disk or provide a [blue]BearerToken[/]")]
+		"[DarkOrange](-O Remote)[/]\t\t\tUse [blue]DefaultCredentials[/] or provide a [blue]BearerToken[/]")]
 	[CommandOption("-A|--AuthMode")]
 	[DefaultValue(CLI.AuthMode.DefaultCredentials)]
 	public AuthMode? AuthMode { get; set; }
 
-	[Description("Remote Authorization token. (-O Remote)\t\tProvide a [blue]BearerToken[/] (Excluide \"Bearer \")")]
+	[Description("[DarkOrange](-O Remote -A BearerToken)[/]\tProvide a [blue]BearerToken[/] (Excluide \"Bearer \")")]
 	[CommandOption("-a|--AuthToken")]
 	public string? AuthToken { get; set; }
 
@@ -82,17 +82,17 @@ public class Settings : CommandSettings {
 	[DefaultValue(false)]
 	public bool Filter { get; set; }
 
-	[Description($"[DarkOrange](-F true)[/]\t\t\tFormat:\t\"MM*dd*yyyy\"")]
+	[Description($"[DarkOrange](-F true)[/]\t\t\tFormat:\t\"MM/dd/yyyy\"")]
 	[CommandOption("-f|--FromDate")]
 	// [DefaultValue(value: GetTodayString())]
 	public string? FromDate { get; set; }
 
-	[Description($"[DarkOrange](-F true)[/]\t\t\tFormat:\t\"MM*dd*yyyy\"")]
+	[Description($"[DarkOrange](-F true)[/]\t\t\tFormat:\t\"MM/dd/yyyy\"")]
 	[CommandOption("-t|--ToDate")]
 	// [DefaultValue(value: GetTodayString())]
 	public string? ToDate { get; set; }
 
-	[Description($"[DarkOrange]Ignore Default Web Site in Operation[/]\tDefault : true")]
+	[Description($"[DarkOrange]Ignore Default Web Site[/]\t\tDefault : true")]
 	[CommandOption("-z|--IgnoreDefaultSite")]
 	[DefaultValue(true)]
 	// [DefaultValue(value: GetTodayString())]
