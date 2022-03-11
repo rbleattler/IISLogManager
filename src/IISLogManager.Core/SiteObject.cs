@@ -4,7 +4,7 @@ using Microsoft.Web.Administration;
 
 namespace IISLogManager.Core {
 	[Serializable]
-	public class SiteObject {
+	public class SiteObject : IDisposable {
 		public string HostName;
 		public string SiteName;
 		public string SiteUrl;
@@ -72,6 +72,10 @@ namespace IISLogManager.Core {
 			GC.Collect();
 		}
 
+		public Span<IISLogObject> ToSpan() {
+			return new Span<IISLogObject>(Logs.ToArray());
+		}
+
 		public void CompressLog(IISLogObject log, bool removeFromLogs) {
 			// Debug.WriteLine("Compressing" + log.UniqueId);
 			string jLog = log.ToJson();
@@ -129,22 +133,11 @@ namespace IISLogManager.Core {
 			return outFileName;
 		}
 
-		//TODO: This is redundant. Need to cleanup redundant methods
-		// private string BuildJsonFileContent() {
-		// 	StringBuilder stringBuilder = new StringBuilder();
-		// 	stringBuilder.AppendLine("{");
-		// 	stringBuilder.AppendLine("[");
-		//
-		// 	foreach (IISLogObject logObject in Logs) {
-		// 		stringBuilder.AppendLine(logObject.ToJson());
-		// 		stringBuilder.Append(",");
-		// 	}
-		//
-		// 	stringBuilder.AppendLine("]");
-		// 	stringBuilder.AppendLine("}");
-		// 	return stringBuilder.ToString();
-		// }
-
 		bool LogsIsNull() => null == Logs;
+
+		public void Dispose() {
+			Logs?.Dispose();
+			_logParser?.Dispose();
+		}
 	}
 }

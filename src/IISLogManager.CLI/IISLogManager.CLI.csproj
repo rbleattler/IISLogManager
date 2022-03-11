@@ -43,6 +43,7 @@
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
         <PackageReference Include="Sharprompt" Version="2.4.0"/>
         <PackageReference Include="Spectre.Console" Version="0.43.1-preview.0.24"/>
+        <PackageReference Include="System.Text.Json" Version="6.0.2"/>
     </ItemGroup>
     <ItemGroup>
         <None Remove="Program.cs.bak"/>

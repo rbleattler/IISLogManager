@@ -37,5 +37,6 @@
         <PackageReference Include="Microsoft.Web.Administration" Version="11.1.0">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="System.Text.Json" Version="6.0.2"/>
     </ItemGroup>
 </Project>
