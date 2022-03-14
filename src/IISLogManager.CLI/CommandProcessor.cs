@@ -69,7 +69,7 @@ public class CommandProcessor {
 		// AnsiConsole.MarkupLine("[[DEBUG]]  Checking if TargetSites is null...");
 		if ( config.TargetSites != null ) {
 			// AnsiConsole.MarkupLine("[[DEBUG]] TargetSites is not null...");
-			if ( config.Settings != null && config.Settings.Filter ) {
+			if ( config.Settings is {Filter: true} ) {
 				int pathCount = 0;
 #if DEBUG
 				config.TargetSites.ForEach(p => pathCount += p.LogFilePaths.Count);
@@ -96,19 +96,13 @@ public class CommandProcessor {
 					continue;
 				}
 
-				if ( config.Settings != null && config.Settings.Filter ) {
-					AnsiConsole.MarkupLine($"[[DEBUG]] Filtering Logs... ( Count : {site.Logs.Count})");
-					site.Logs.FilterLogs(
-						DateTime.Parse(config.Settings.FromDate!),
-						DateTime.Parse(config.Settings.ToDate!)
-					);
-					AnsiConsole.MarkupLine($"[[DEBUG]] Filtering Logs... ( New Count : {site.Logs.Count})");
-				}
-
 				if ( config.OutputMode == OutputMode.Local ) {
 					AnsiConsole.MarkupLine($"[[DEBUG]] Output mode Local...");
 					var outFile = site.GetLogFileName(config.OutputDirectory);
+					site.Logs.TrimExcess();
 					site.Logs.WriteToFile(outFile);
+					site.Logs.Clear();
+					site.Logs.Dispose();
 					AnsiConsole.MarkupLine($"[DarkOrange]Output File :[/] {outFile}");
 				}
 
@@ -138,6 +132,8 @@ public class CommandProcessor {
 
 					//TODO: Process Logs for remote output
 				}
+
+				site.Dispose();
 			}
 		}
 	}
