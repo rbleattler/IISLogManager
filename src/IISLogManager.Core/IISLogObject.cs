@@ -1,61 +1,175 @@
 ﻿using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace IISLogManager.Core;
 
-[Serializable]
+[JsonSerializable(typeof(IISLogObject))]
 public class IISLogObject : MPropertyAsStringSettable {
-	public Guid UniqueId { get; set; } = Guid.NewGuid();
+	private Guid _uniqueId = Guid.NewGuid();
+	private DateTime _dateTime;
+	private string _sSiteName;
+	private string _SiteUrl;
+	private string _sComputerName;
+	private string _sIp;
+	private string _csMethod;
+	private string _csUriStem;
+	private string _csUriQuery;
+	private int? _sPort;
+	private string _csUsername;
+	private string _cIp;
+	private string _csVersion;
+	private string _csUserAgent;
+	private string _csCookie;
+	private string _csReferer;
+	private string _csHost;
+	private int? _scStatus;
+	private int? _scSubstatus;
+	private long? _scWin32Status;
+	private int? _scBytes;
+	private int? _csBytes;
+	private int? _timeTaken;
+	private string _xForwardedFor;
 
-	public DateTime LogDateTime { get; set; }
+	private JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings {
+		DateTimeZoneHandling = DateTimeZoneHandling.Local,
+		DateFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ss tt",
+		PreserveReferencesHandling = PreserveReferencesHandling.All
+	};
 
-	public string sSitename { get; set; }
+	public string UniqueId {
+		get => _uniqueId.ToString();
+		set => _uniqueId = new Guid(value);
+	}
 
-	public string sComputername { get; set; }
 
-	public string sIp { get; set; }
+	public DateTime DateTime {
+		get => _dateTime;
+		set => _dateTime = value;
+	}
 
-	public string csMethod { get; set; }
+	public string SiteName {
+		get => _sSiteName;
+		set => _sSiteName = value;
+	}
 
-	public string csUriStem { get; set; }
+	public string SiteUrl {
+		get => _SiteUrl;
+		set => _SiteUrl = value;
+	}
 
-	public string csUriQuery { get; set; }
+	public string ComputerName {
+		get => _sComputerName;
+		set => _sComputerName = value;
+	}
 
-	public int? sPort { get; set; }
+	public string ServerIp {
+		get => _sIp;
+		set => _sIp = value;
+	}
 
-	public string csUsername { get; set; }
+	public string Method {
+		get => _csMethod;
+		set => _csMethod = value;
+	}
 
-	public string cIp { get; set; }
+	public string UriStem {
+		get => _csUriStem;
+		set => _csUriStem = value;
+	}
 
-	public string csVersion { get; set; }
+	public string UriQuery {
+		get => _csUriQuery;
+		set => _csUriQuery = value;
+	}
 
-	public string csUserAgent { get; set; }
+	public int? ServerPort {
+		get => _sPort;
+		set => _sPort = value;
+	}
 
-	public string csCookie { get; set; }
+	public string Username {
+		get => _csUsername;
+		set => _csUsername = value;
+	}
 
-	public string csReferer { get; set; }
+	public string ClientIp {
+		get => _cIp;
+		set => _cIp = value;
+	}
 
-	public string csHost { get; set; }
+	public string Version {
+		get => _csVersion;
+		set => _csVersion = value;
+	}
 
-	public int? scStatus { get; set; }
+	public string UserAgent {
+		get => _csUserAgent;
+		set => _csUserAgent = value;
+	}
 
-	public int? scSubstatus { get; set; }
+	public string Cookie {
+		get => _csCookie;
+		set => _csCookie = value;
+	}
 
-	public long? scWin32Status { get; set; }
+	public string Referer {
+		get => _csReferer;
+		set => _csReferer = value;
+	}
 
-	public int? scBytes { get; set; }
+	public string HostName {
+		get => _csHost;
+		set => _csHost = value;
+	}
 
-	public int? csBytes { get; set; }
+	public int? HttpStatus {
+		get => _scStatus;
+		set => _scStatus = value;
+	}
 
-	public int? timeTaken { get; set; }
+	public int? ProtocolSubstatus {
+		get => _scSubstatus;
+		set => _scSubstatus = value;
+	}
 
-	public string xForwardedFor { get; set; }
+	public long? Win32Status {
+		get => _scWin32Status;
+		set => _scWin32Status = value;
+	}
+
+	public int? ServerClientBytes {
+		get => _scBytes;
+		set => _scBytes = value;
+	}
+
+	public int? ClientServerBytes {
+		get => _csBytes;
+		set => _csBytes = value;
+	}
+
+	public int? TimeTaken {
+		get => _timeTaken;
+		set => _timeTaken = value;
+	}
+
+	public string ForwardedFor {
+		get => _xForwardedFor;
+		set => _xForwardedFor = value;
+	}
+
 	public IISLogObject() { }
+
+	public IISLogObject(string jsonObject) {
+		FromJson(jsonObject);
+	}
+	// private From
 
 	public IISLogObject(
 		Guid uniqueId,
-		DateTime logDateTime,
-		string sSitename,
-		string sComputername,
+		DateTime dateTime,
+		string sSiteName,
+		string siteUrl,
+		string sComputerName,
 		string sIp,
 		string csMethod,
 		string csUriStem,
@@ -69,23 +183,25 @@ public class IISLogObject : MPropertyAsStringSettable {
 		string csHost,
 		string xForwardedFor
 	) {
-		UniqueId = uniqueId;
-		LogDateTime = logDateTime;
-		this.sSitename = sSitename;
-		this.sComputername = sComputername;
-		this.sIp = sIp;
-		this.csMethod = csMethod;
-		this.csUriStem = csUriStem;
-		this.csUriQuery = csUriQuery;
-		this.csUsername = csUsername;
-		this.cIp = cIp;
-		this.csVersion = csVersion;
-		this.csUserAgent = csUserAgent;
-		this.csCookie = csCookie;
-		this.csReferer = csReferer;
-		this.csHost = csHost;
-		this.xForwardedFor = xForwardedFor;
+		UniqueId = uniqueId.ToString();
+		DateTime = dateTime;
+		SiteName = sSiteName;
+		SiteUrl = siteUrl;
+		ComputerName = sComputerName;
+		ServerIp = sIp;
+		Method = csMethod;
+		UriStem = csUriStem;
+		UriQuery = csUriQuery;
+		Username = csUsername;
+		ClientIp = cIp;
+		Version = csVersion;
+		UserAgent = csUserAgent;
+		Cookie = csCookie;
+		Referer = csReferer;
+		HostName = csHost;
+		ForwardedFor = xForwardedFor;
 	}
+
 
 	/// <summary> 
 	/// This is meant to build an IISLogObject from a hashtable / dictionary
@@ -120,6 +236,11 @@ public class IISLogObject : MPropertyAsStringSettable {
 		return serializedObject;
 	}
 
+	public IISLogObject FromJson(string jsonObject) {
+		JsonConvert.PopulateObject(jsonObject, this);
+		return this;
+	}
+
 	public void AppendToFile(string filePath) {
 		AppendToFile(filePath, true);
 	}
@@ -139,7 +260,7 @@ public class IISLogObject : MPropertyAsStringSettable {
 		typeof(IISLogObject)?.GetProperty(propertyName)?.SetValue(this, value);
 	}
 
-	public dynamic GetProperty(string propertyName) {
-		return typeof(IISLogObject)?.GetProperty(propertyName)?.GetValue(this, null);
+	public string GetProperty(string propertyName) {
+		return (string) typeof(IISLogObject)?.GetProperty(propertyName)?.GetValue(this, null);
 	}
 }
