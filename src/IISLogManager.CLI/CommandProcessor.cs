@@ -1,5 +1,4 @@
 ﻿using IISLogManager.Core;
-using System.Text;
 using Spectre.Console;
 
 namespace IISLogManager.CLI;

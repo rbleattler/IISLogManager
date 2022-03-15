@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
@@ -75,8 +74,6 @@ public class Settings : CommandSettings {
 	[CommandOption("-t|--ToDate")]
 	// [DefaultValue(value: GetTodayString())]
 	public string? ToDate { get; set; }
-
-	public Settings() { }
 
 	public override ValidationResult Validate() {
 		//TODO: Add ParameterSet validation

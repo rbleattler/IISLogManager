@@ -1,7 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Spectre.Console;
-using Spectre.Console.Cli;
-using IISLogManager.Core;
+﻿using Spectre.Console;
 
 namespace IISLogManager.CLI;
 
@@ -10,11 +7,6 @@ public class Fascia {
 
 	public Fascia() {
 		LiveDisplay.Overflow = VerticalOverflow.Crop;
-		LiveDisplay.Start(context => {
-			
-		});
+		LiveDisplay.Start(context => { });
 	}
-	
-	
-	
 }
