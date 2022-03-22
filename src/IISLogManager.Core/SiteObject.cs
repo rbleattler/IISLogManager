@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using Microsoft.Web.Administration;
 using Newtonsoft.Json;
@@ -16,6 +17,7 @@ public class SiteObject : IDisposable {
 	public LogFormat LogFormat;
 	public List<string> LogFilePaths;
 	public IISLogObjectCollection Logs = new();
+	public ConcurrentBag<IISLogObject> ConcurrentLogs = new();
 	public List<string> CompressedLogs = new();
 	private ParseEngine _logParser = new();
 
@@ -57,6 +59,18 @@ public class SiteObject : IDisposable {
 		}
 		//stopwatch.Stop();
 		//Debug.WriteLine($"processed {filePath} in {stopwatch.Elapsed}");
+	}
+
+	public Task ParseLogsAsync(string filePath, CancellationToken? cancellationToken) {
+		var logParserInstance = new ParseEngine();
+		logParserInstance.FilePath = filePath;
+		// Debug.WriteLine("Parsing" + filePath);
+		var parsedLogs = logParserInstance.ParseLog();
+		foreach (IISLogObject logObject in parsedLogs) {
+			ConcurrentLogs.Add(logObject);
+		}
+
+		return Task.CompletedTask;
 	}
 
 	// TODO: Explore this?
