@@ -12,7 +12,7 @@ public class ParseEngine : IDisposable {
 	}
 
 	public bool MissingRecords { get; private set; } = true;
-	public int MaxRecordsToProcess { get; set; } = 1000000;
+	public int MaxRecordsToProcess { get; set; } = 100000000;
 
 	public int CurrentFileRecord { get; private set; }
 
