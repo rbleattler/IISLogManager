@@ -2,5 +2,7 @@
 
 public enum OutputMode {
 	Local,
-	Remote
+	LocalDb,
+	Remote,
+	RemoteDb
 }
