@@ -14,7 +14,9 @@ public class Examples {
 			"-h",
 			"-i",
 			"-r Target -s \"Default Web Site, Web Site 2\" -O Local -o C:\\Test",
-			"-r Target -s Default Web Site -F -f 01/01/2021 -t 01/01/2022"
+			"-r Target -s Default Web Site -F -f 01/01/2021 -t 01/01/2022",
+			"getsites",
+			"getsites id"
 		};
 		return ex;
 	}
