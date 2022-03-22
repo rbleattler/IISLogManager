@@ -13,9 +13,10 @@ public class RunPrompts {
 		.AddChoices(RunMode.All, RunMode.Target);
 
 	public static SelectionPrompt<OutputMode> OutputModePrompt = new SelectionPrompt<OutputMode>()
-		.Title("Do you want to output to a [green] Local [/] file, or [green] Remote (specific)[/] endpoint?")
-		.PageSize(3)
-		.AddChoices(OutputMode.Local, OutputMode.Remote);
+		.Title(
+			"Choose output mode : [green] Local [/] file,[green] Remote (specific)[/] endpoint,[green] Remote (specific)[/] Db, [green] Local (specific)[/] Db")
+		.PageSize(4)
+		.AddChoices(OutputMode.Local, OutputMode.Remote, OutputMode.LocalDb, OutputMode.RemoteDb);
 
 	public static MultiSelectionPrompt<string> SiteSelectPrompt = new MultiSelectionPrompt<string>()
 		.Title("Choose sites to process : ")
@@ -63,10 +64,22 @@ public class RunPrompts {
 		.AddChoices(AuthMode.BearerToken, AuthMode.DefaultCredentials)
 		.PageSize(3);
 
+	public static SelectionPrompt<DatabaseProvider> DatabaseProviderPrompt = new SelectionPrompt<DatabaseProvider>()
+		.Title("Which type of database are you connecting to?")
+		.AddChoices(
+			DatabaseProvider.SQL,
+			DatabaseProvider.MySQL,
+			DatabaseProvider.PostgreSQL,
+			DatabaseProvider.Sqlite,
+			DatabaseProvider.Oracle
+		)
+		.PageSize(5);
+
 	public static TextPrompt<string> BearerTokenPrompt = new("Enter the Authorization token (without\"Bearer \"");
 
 	public static TextPrompt<string> StartDatePrompt = new(@"Enter the start date to parse logs from (MM/dd/yyyy)");
 	public static TextPrompt<string> EndDatePrompt = new(@"Enter the end date to parse logs from (MM/dd/yyyy)");
+	public static TextPrompt<string> ConnectionStringPrompt = new("Enter the Database Connection String: ");
 
 
 	public static TextPrompt<string> OutUriPrompt =
@@ -74,22 +87,47 @@ public class RunPrompts {
 
 	public static ConfirmationPrompt ConfirmContinuePrompt = new("Ready to continue?");
 
-	public static void ExecutePrompts(ref RunMode? runMode, ref OutputMode? outputMode, ref string? outputUri,
-		ref string? outputDirectory, ref List<string> siteChoices, ref IISController iisController,
-		ref SiteObjectCollection? targetSites, ref FilterConfiguration filterConfiguration, ref AuthMode? authMode,
-		ref string? authToken) {
+	public static void ExecutePrompts(
+		ref RunMode? runMode,
+		ref OutputMode? outputMode,
+		ref string? outputUri,
+		ref string? outputDirectory,
+		ref List<string> siteChoices,
+		ref IISController iisController,
+		ref SiteObjectCollection? targetSites,
+		ref FilterConfiguration filterConfiguration,
+		ref AuthMode? authMode,
+		ref string? authToken,
+		ref string? connectionString,
+		ref DatabaseProvider? databaseProvider
+	) {
 		runMode = AnsiConsole.Prompt(RunModePrompt);
 		outputMode = AnsiConsole.Prompt(OutputModePrompt);
-		if ( outputMode == OutputMode.Remote ) {
-			outputUri = AnsiConsole.Prompt(OutUriPrompt);
-			authMode = AnsiConsole.Prompt(BearerAuthPrompt);
-			if ( authMode == AuthMode.BearerToken ) {
-				authToken = AnsiConsole.Prompt(BearerTokenPrompt);
-			}
-		}
+		switch (outputMode) {
+			case OutputMode.Remote: {
+				outputUri = AnsiConsole.Prompt(OutUriPrompt);
+				authMode = AnsiConsole.Prompt(BearerAuthPrompt);
+				if ( authMode == AuthMode.BearerToken ) {
+					authToken = AnsiConsole.Prompt(BearerTokenPrompt);
+				}
 
-		if ( outputMode == OutputMode.Local ) {
-			outputDirectory = AnsiConsole.Prompt(OutDirectoryPrompt);
+				break;
+			}
+			case OutputMode.Local:
+				outputDirectory = AnsiConsole.Prompt(OutDirectoryPrompt);
+				break;
+			case OutputMode.LocalDb:
+				databaseProvider = AnsiConsole.Prompt(DatabaseProviderPrompt);
+				connectionString = AnsiConsole.Prompt(ConnectionStringPrompt);
+				break;
+			case OutputMode.RemoteDb:
+				databaseProvider = AnsiConsole.Prompt(DatabaseProviderPrompt);
+				connectionString = AnsiConsole.Prompt(ConnectionStringPrompt);
+				break;
+			case null:
+				break;
+			default:
+				throw new ArgumentOutOfRangeException();
 		}
 
 		if ( runMode == RunMode.Target ) {
