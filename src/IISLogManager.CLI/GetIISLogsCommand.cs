@@ -24,6 +24,8 @@ class GetIISLogsCommand : Command<Settings> {
 		RunMode? runMode = settings.Interactive ? null : settings.RunMode;
 		OutputMode? outputMode = settings.OutputMode;
 		var outputDirectory = settings.OutputDirectory;
+		var connectionString = settings.ConnectionString;
+		var databaseProvider = settings.DatabaseProvider;
 		var outputUri = settings.Uri;
 		var authMode = settings.AuthMode;
 		var authToken = settings.AuthToken;
@@ -52,7 +54,9 @@ class GetIISLogsCommand : Command<Settings> {
 				targetSites: ref  targetSites,
 				filterConfiguration: ref filterConfiguration,
 				authMode: ref authMode,
-				authToken: ref authToken
+				authToken: ref authToken,
+				connectionString: ref connectionString,
+				databaseProvider: ref databaseProvider
 			);
 		}
 
@@ -62,9 +66,20 @@ class GetIISLogsCommand : Command<Settings> {
 			case OutputMode.Local:
 				AnsiConsole.MarkupLine($"[DarkOrange]Output Directory[/] : {outputDirectory}");
 				break;
+			case OutputMode.LocalDb:
+				AnsiConsole.MarkupLine($"[DarkOrange]Local Db ConnectionString[/] : {connectionString}");
+				break;
 			case OutputMode.Remote:
 				AnsiConsole.MarkupLine($"[DarkOrange]Output URI[/] : {outputUri}");
 				break;
+			case OutputMode.RemoteDb:
+				AnsiConsole.MarkupLine(
+					$"[DarkOrange]Remote Db ConnectionString[/] : {connectionString}");
+				break;
+			case null:
+				break;
+			default:
+				throw new ArgumentOutOfRangeException();
 		}
 
 		AnsiConsole.MarkupLine($"[DarkOrange]Target Sites[/] :");
@@ -90,11 +105,18 @@ class GetIISLogsCommand : Command<Settings> {
 			authToken: authToken,
 			outputDirectory: outputDirectory,
 			outputUri: outputUri,
-			settings: settings
+			settings: settings,
+			connectionString: connectionString,
+			databaseProvider: databaseProvider
 		);
 
 		AnsiConsole.MarkupLine("[DarkOrange]Beginning Log Processsing...[/]");
-		CommandProcessor.Instance.ProcessLogs(ref commandConfiguration);
+		if ( settings.Parallel == true && outputMode == OutputMode.RemoteDb ) {
+			CommandProcessor.Instance.ProcessLogsAsync(ref commandConfiguration).Wait();
+		} else {
+			CommandProcessor.Instance.ProcessLogs(ref commandConfiguration);
+		}
+
 		AnsiConsole.MarkupLine("[DarkOrange]Finished Processing Logs![/]");
 
 
