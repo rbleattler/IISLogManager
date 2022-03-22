@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 using System.Text.Json.Serialization;
 
 namespace IISLogManager.Core;
@@ -8,7 +9,7 @@ public class IISLogObject : MPropertyAsStringSettable {
 	private Guid _uniqueId = Guid.NewGuid();
 	private DateTime _dateTime;
 	private string _sSiteName;
-	private string _SiteUrl;
+	private string _siteUrl;
 	private string _sComputerName;
 	private string _sIp;
 	private string _csMethod;
@@ -36,6 +37,7 @@ public class IISLogObject : MPropertyAsStringSettable {
 		PreserveReferencesHandling = PreserveReferencesHandling.All
 	};
 
+	[Key]
 	public string UniqueId {
 		get => _uniqueId.ToString();
 		set => _uniqueId = new Guid(value);
@@ -53,8 +55,8 @@ public class IISLogObject : MPropertyAsStringSettable {
 	}
 
 	public string SiteUrl {
-		get => _SiteUrl;
-		set => _SiteUrl = value;
+		get => _siteUrl;
+		set => _siteUrl = value;
 	}
 
 	public string ComputerName {
