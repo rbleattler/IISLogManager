@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using Spectre.Console;
+using IISLogManager.Core;
 using Spectre.Console.Cli;
 
 namespace IISLogManager.CLI;
@@ -11,19 +12,19 @@ public class Settings : CommandSettings {
 	public static readonly string OneYearAgoTodayString = OneYearAgoToday.ToString();
 
 	[CommandArgument(0, "[GetSites]")]
-	[Description("Lists all websites [DarkOrange]Name[/][Blue] (Url)[/]")]
+	[Description("[Magenta]Lists all websites\t\t[DarkOrange]Name[/][Blue] (Url)[/][/]")]
 	public string? GetSites { get; set; }
 
 	[CommandArgument(1, "[Id]")]
-	[Description("Lists all website Ids [DarkOrange]GetSites Id[/]")]
+	[Description("[Magenta]Lists all website Ids\t\t[DarkOrange]GetSites Id[/][/]")]
 	public string? Id { get; set; }
 
-	[Description("Interactive Mode.\t\t[red]NOTE [/]:\tDISABLES ALL OTHER COMMAND LINE OPTIONS")]
+	[Description("[Magenta]Interactive Mode.[/]\t\t[red]NOTE [/]:\tDISABLES ALL OTHER COMMAND LINE OPTIONS")]
 	[DefaultValue(false)]
 	[CommandOption("-i|--interactive")]
 	public bool Interactive { get; set; }
 
-	[Description("Run Mode.\t\t\t[blue]All[/] sites / [blue]Target[/] sites")]
+	[Description("[Magenta]Run Mode.[/]\t\t\t[blue]All[/] sites / [blue]Target[/] sites")]
 	[CommandOption("-r|--runmode")]
 	[DefaultValue(CLI.RunMode.All)]
 	public RunMode? RunMode { get; set; }
@@ -36,20 +37,25 @@ public class Settings : CommandSettings {
 	[CommandOption("-S|--Sites")]
 	public string? SiteUrls { get; set; }
 
-	[Description("Output Mode.\t\t[blue]Local[/] disk / [blue]Remote[/] endpoint")]
+	[Description(
+		"[Magenta]Output Mode.[/]\t\t[blue]Local[/] disk, [blue]Remote[/] endpoint, [blue]LocalDb[/], [blue]RemoteDb[/]")]
 	[CommandOption("-O|--OutputMode")]
 	[DefaultValue(CLI.OutputMode.Local)]
 	public OutputMode? OutputMode { get; set; }
 
+
 	[Description(
-		"Remote Authorization Mode. (-O Remote)\t\tUse [blue]DefaultCredentials[/] disk or provide a [blue]BearerToken[/]")]
+		"[DarkOrange](-O Remote)[/]\t\tRemote Authorization Mode.\nUse [blue]DefaultCredentials[/] or provide a [blue]BearerToken[/]"
+	)]
 	[CommandOption("-A|--AuthMode")]
 	[DefaultValue(CLI.AuthMode.DefaultCredentials)]
 	public AuthMode? AuthMode { get; set; }
 
-	[Description("Remote Authorization token. (-O Remote)\t\tProvide a [blue]BearerToken[/] (Excluide \"Bearer \")")]
+	[Description(
+		"[DarkOrange](-O Remote)[/]\t\tRemote Authorization token.\nProvide a [blue]BearerToken[/] (Exclude \"Bearer \")")]
 	[CommandOption("-a|--AuthToken")]
 	public string? AuthToken { get; set; }
+
 
 	[Description("[DarkOrange](-O Local)[/]")]
 	[CommandOption("-o|--OutputDirectory")]
@@ -60,7 +66,20 @@ public class Settings : CommandSettings {
 	[DefaultValue("localhost:45352")]
 	public string? Uri { get; set; }
 
-	[Description($"[DarkOrange]Enable Filtering Logs[/]")]
+	[Description("[DarkOrange](-O *Db)[/]")]
+	[CommandOption("-c|--ConnectionString")]
+	public String? ConnectionString { get; set; }
+
+	[Description("[DarkOrange](-O *Db)[/]")]
+	[CommandOption("-T|--TableName")]
+
+	public String? TableName { get; set; }
+
+	[Description("[DarkOrange](-O *Db)[/]\t\t\tSQL, Sqlite, MySQL, PostgreSQL, Oracle ")]
+	[CommandOption("-p|--Provider")]
+	public DatabaseProvider? DatabaseProvider { get; set; }
+
+	[Description($"[Magenta]Enable Filtering Logs[/]")]
 	[CommandOption("-F|--Filter")]
 	[DefaultValue(false)]
 	public bool Filter { get; set; }
@@ -74,6 +93,13 @@ public class Settings : CommandSettings {
 	[CommandOption("-t|--ToDate")]
 	// [DefaultValue(value: GetTodayString())]
 	public string? ToDate { get; set; }
+
+	[Description(
+		$"[DarkOrange](-Parallel-Experimental true)[/]\t\tExperimental parallel processing.[red]May cause unexpected results![/]")]
+	[CommandOption("--Parallel-Experimental")]
+	[DefaultValue(false)]
+	// [DefaultValue(value: GetTodayString())]
+	public bool? Parallel { get; set; }
 
 	public override ValidationResult Validate() {
 		//TODO: Add ParameterSet validation
