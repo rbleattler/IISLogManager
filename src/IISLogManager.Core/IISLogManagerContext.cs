@@ -1,7 +1,9 @@
-﻿using System.ComponentModel;
+﻿#nullable enable
+using System.ComponentModel;
 using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.SqlServer;
 using MySqlConnector;
 using Pomelo.EntityFrameworkCore.MySql;
 
@@ -11,7 +13,8 @@ public class IISLogManagerContext : DbContext {
 	public DbSet<IISLogObject> IISLogObjectSet { get; set; }
 	public string ConnectionString { get; init; }
 	private DatabaseProvider DatabaseProvider { get; init; }
-	public string TableName { get; set; } = "IISLogs";
+	public string TableName { get; set; }
+	public string[] IgnoredFields { get; init; }
 
 	//TODO: Default Implementations where a local database is created 
 
@@ -19,12 +22,17 @@ public class IISLogManagerContext : DbContext {
 		modelBuilder.Entity<IISLogObject>(entity => {
 			entity.ToTable(TableName);
 			entity.HasKey("UniqueId");
+			if ( !IgnoredFields.Any() ) return;
+			foreach (var ignoredField in IgnoredFields) {
+				entity.Ignore(ignoredField);
+			}
 		});
 	}
 
 	protected override void OnConfiguring(DbContextOptionsBuilder options) {
 		switch (DatabaseProvider) {
 			case DatabaseProvider.SQL:
+				options.UseSqlServer(ConnectionString);
 				throw new NotImplementedException(
 					"SQL (Server) Provider is not yet implemented.");
 			case DatabaseProvider.Sqlite:
@@ -33,7 +41,8 @@ public class IISLogManagerContext : DbContext {
 			case DatabaseProvider.MySQL:
 				var mySqlConnection = new MySqlConnection(ConnectionString);
 				options.UseMySql(ConnectionString, ServerVersion.AutoDetect(mySqlConnection));
-				throw new WarningException("MySQL Provider implementation is unstable. Use at your own risk!");
+				break;
+			// throw new WarningException("MySQL Provider implementation is unstable. Use at your own risk!");
 			case DatabaseProvider.PostgreSQL:
 				throw new NotImplementedException(
 					"PostgreSQL Provider is not yet implemented.");
@@ -51,11 +60,11 @@ public class IISLogManagerContext : DbContext {
 	// }
 
 	public IISLogManagerContext(DatabaseProvider databaseProvider, string connectionString,
-		string? tableName) {
+		string? tableName, string[]? ignoredFields) {
 		tableName = string.IsNullOrWhiteSpace(tableName) ? "IISLogs" : tableName;
-		// if ( string.IsNullOrWhiteSpace(tableName) ) tableName = "IISLogs";
 		DatabaseProvider = databaseProvider;
 		ConnectionString = connectionString;
 		TableName = tableName;
+		IgnoredFields = ignoredFields;
 	}
 }
