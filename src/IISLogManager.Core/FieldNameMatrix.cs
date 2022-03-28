@@ -18,6 +18,7 @@ public readonly struct FieldNameMatrix {
 	public readonly string Win32Status = "sc-win32-status";
 	public readonly string TimeTaken = "time-taken";
 	public readonly string ForwardedFor = "X-Forwarded-For";
+
 	public static readonly FieldNameMatrix Instance = new();
 
 	public FieldNameMatrix() { }
