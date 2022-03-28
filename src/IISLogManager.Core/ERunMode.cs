@@ -1,4 +1,4 @@
-﻿namespace IISLogManager.CLI;
+﻿namespace IISLogManager.Core;
 
 public enum RunMode {
 	All,
