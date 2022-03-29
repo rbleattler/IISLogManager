@@ -36,9 +36,13 @@ public class ParseEngine : IDisposable {
 	public IEnumerable<IISLogObject> ParseLog() {
 		if ( MbSize < 50 ) {
 			return QuickProcess();
-		} else {
-			return LongProcess();
 		}
+
+		return LongProcess();
+	}
+
+	internal void ParsePartialLog(int startLine, int count, ref IISLogObjectCollection logs, string headerLine) {
+		PartialProcess(startLine, count, ref logs, headerLine);
 	}
 
 	private IEnumerable<IISLogObject> QuickProcess() {
@@ -72,9 +76,35 @@ public class ParseEngine : IDisposable {
 		return logs;
 	}
 
+	private void PartialProcess(int startLine, int processCount, ref IISLogObjectCollection logs, string headerLine) {
+		var skipCount = startLine - 1;
+		var lines = File
+			.ReadLines(FilePath)
+			.Skip(skipCount)
+			.Take(processCount);
+		foreach (var line in lines) {
+			ProcessLine(headerLine, line, logs);
+		}
+	}
+
+	private void ProcessLine(string headerLine, string line, IISLogObjectCollection logs) {
+		_headerFields = headerLine
+			.Replace("#Fields: ", string.Empty)
+			.Split(' ');
+
+		if ( !line.StartsWith("#") && _headerFields != null ) {
+			string[] fieldsData = line.Split(' ');
+			FillDataStruct(fieldsData, _headerFields);
+			logs?.Add(NewLogObj());
+			CurrentFileRecord++;
+		}
+	}
+
 	private void ProcessLine(string line, IISLogObjectCollection logs) {
 		if ( line.StartsWith("#Fields:") ) {
-			_headerFields = line.Replace("#Fields: ", string.Empty).Split(' ');
+			_headerFields = line
+				.Replace("#Fields: ", string.Empty)
+				.Split(' ');
 		}
 
 		if ( !line.StartsWith("#") && _headerFields != null ) {
