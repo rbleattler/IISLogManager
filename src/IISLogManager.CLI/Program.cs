@@ -1,4 +1,5 @@
 ﻿using Spectre.Console.Cli;
+using IISLogManager.Core;
 
 namespace IISLogManager.CLI;
 
@@ -16,7 +17,6 @@ public class Program {
 			// config.Settings.Console.Profile.Capabilities.Legacy
 			// Help Example
 			Examples.Instance.GetExamples().ForEach(e => { config.AddExample(new[] {e}); });
-			
 		});
 		// app.Configure();
 		return app.Run(args);

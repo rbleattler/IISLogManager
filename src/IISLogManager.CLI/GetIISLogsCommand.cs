@@ -10,6 +10,10 @@ class GetIISLogsCommand : Command<Settings> {
 	public override int Execute([NotNull] CommandContext context, [NotNull] Settings settings) {
 		if ( context == null ) throw new ArgumentNullException(nameof(context));
 		if ( settings == null ) throw new ArgumentNullException(nameof(settings));
+		if ( !string.IsNullOrWhiteSpace(settings.ConfigurationFile) ) {
+			settings.ImportConfiguration(settings.ConfigurationFile); // TODO: Add Yaml Support
+		}
+
 		IISController iisController = new();
 		SiteObjectCollection? targetSites = new();
 		FilterState filter = settings.Filter.As<FilterState>();
