@@ -26,6 +26,7 @@
         <Compile Remove="scratch\**"/>
         <EmbeddedResource Remove="scratch\**"/>
         <None Remove="scratch\**"/>
+        <Compile Remove="Fascia.cs"/>
     </ItemGroup>
     <ItemGroup>
         <!-- 
