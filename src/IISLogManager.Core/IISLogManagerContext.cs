@@ -14,7 +14,7 @@ public class IISLogManagerContext : DbContext {
 	public string ConnectionString { get; init; }
 	private DatabaseProvider DatabaseProvider { get; init; }
 	public string TableName { get; set; }
-	public string[] IgnoredFields { get; init; }
+	public string[]? IgnoredFields { get; set; }
 
 	//TODO: Default Implementations where a local database is created 
 
@@ -22,10 +22,10 @@ public class IISLogManagerContext : DbContext {
 		modelBuilder.Entity<IISLogObject>(entity => {
 			entity.ToTable(TableName);
 			entity.HasKey("UniqueId");
-			if ( !IgnoredFields.Any() ) return;
-			foreach (var ignoredField in IgnoredFields) {
-				entity.Ignore(ignoredField);
-			}
+			if ( IgnoredFields != null )
+				foreach (var ignoredField in IgnoredFields) {
+					entity.Ignore(ignoredField);
+				}
 		});
 	}
 
