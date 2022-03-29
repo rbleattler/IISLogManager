@@ -144,4 +144,19 @@ public static class Utils {
 
 		return null;
 	}
+
+// https://grabthiscode.com/csharp/c-counting-lines
+	public static long CountLines(FileInfo file)
+		=> File.ReadLines(file.FullName).Count();
+
+	public static long CountLines(string filePath)
+		=> File.ReadLines(filePath).Count();
+
+	public static string GetHeaderLine(string filePath) {
+		return File.ReadLines(filePath).Where(l => l.StartsWith("#Fields:")).First();
+	}
+
+	public static int GetProcessorCores() {
+		return Environment.ProcessorCount;
+	}
 }
