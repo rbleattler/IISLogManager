@@ -61,6 +61,13 @@ public class SiteObject : IDisposable {
 		//Debug.WriteLine($"processed {filePath} in {stopwatch.Elapsed}");
 	}
 
+	public void ParseLogs(string filePath, int startLine, int count, string? headerLine) {
+		var logParserInstance = new ParseEngine();
+		logParserInstance.FilePath = filePath;
+		logParserInstance.ParsePartialLog(startLine, count, ref Logs, headerLine);
+	}
+
+
 	public Task ParseLogsAsync(string filePath, CancellationToken? cancellationToken) {
 		var logParserInstance = new ParseEngine();
 		logParserInstance.FilePath = filePath;
