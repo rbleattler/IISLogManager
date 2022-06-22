@@ -15,8 +15,8 @@ public class CommandProcessor {
 		var runmode = runMode;
 		AnsiConsole.Status()
 			.Start("Adding Sites...", ctx => {
-				if ( !settings!.Interactive && settings.RunMode == RunMode.Target ) {
-					if ( settings.SiteNames?.Length > 0 ) {
+				if (!settings!.Interactive && settings.RunMode == RunMode.Target) {
+					if (settings.SiteNames?.Length > 0) {
 						AnsiConsole.MarkupLine($"Adding {settings.SiteNames?.Length} sites...");
 						string[]? splitSiteNames =
 							settings.SiteNames?.Split(',', StringSplitOptions.RemoveEmptyEntries);
@@ -28,17 +28,17 @@ public class CommandProcessor {
 						}
 					}
 
-					if ( settings.SiteUrls?.Length > 0 ) {
+					if (settings.SiteUrls?.Length > 0) {
 						AnsiConsole.MarkupLine($"Adding {settings.SiteUrls?.Count()} sites...");
 						foreach (string siteUrl in
-						         settings.SiteUrls?.Split(',', StringSplitOptions.RemoveEmptyEntries)!) {
+								 settings.SiteUrls?.Split(',', StringSplitOptions.RemoveEmptyEntries)!) {
 							var tsAdd = iisController.Sites.Where(sO => sO.SiteUrl == siteUrl.Trim());
 							sites?.AddRange(tsAdd);
 						}
 					}
 				}
 
-				if ( runmode == RunMode.All ) {
+				if (runmode == RunMode.All) {
 					sites?.AddRange(iisController.Sites);
 				}
 			});
@@ -68,15 +68,15 @@ public class CommandProcessor {
 	//TODO: Ensure there *ARE* logs to process before beginning processing... 
 	public void ProcessLogs(ref CommandConfiguration config) {
 		//TODO: Add verbose output
-		if ( config.TargetSites != null ) {
+		if (config.TargetSites != null) {
 			FilterLogs(ref config);
-			if ( config.TargetSites != null )
+			if (config.TargetSites != null)
 				foreach (var site in config.TargetSites) {
 					var targetSite = site;
 					AnsiConsole.MarkupLine($"[[DEBUG]] Processing {site.SiteName}...");
-					if ( config.OutputMode != OutputMode.LocalDb ) {
+					if (config.OutputMode != OutputMode.LocalDb) {
 						site.ParseAllLogs(); //TODO: Update to implement as a dependent process of the output mode and size/number of logs for a given site
-						if ( site.Logs.Count <= 0 ) { }
+						if (site.Logs.Count <= 0) { }
 
 						AnsiConsole.MarkupLine(
 							$"[DarkOrange]{site.SiteName}[/] has no logs from the target date range...");
@@ -91,9 +91,9 @@ public class CommandProcessor {
 
 	public Task ProcessLogsAsync(ref CommandConfiguration config) {
 		//TODO: Add verbose output
-		if ( config.TargetSites != null ) {
+		if (config.TargetSites != null) {
 			// AnsiConsole.MarkupLine("[[DEBUG]] TargetSites is not null...");
-			if ( config.Settings is {Filter: true} ) {
+			if (config.Settings is { Filter: true }) {
 				int pathCount = 0;
 #if DEBUG
 				config.TargetSites.ForEach(p => pathCount += p.LogFilePaths.Count);
@@ -105,10 +105,10 @@ public class CommandProcessor {
 #endif
 				config.TargetSites.FilterAllLogFiles(
 					DateTime.Parse(config.Settings.FromDate ??
-					               DateTime.Today.AddMonths(-1).ToString(CultureInfo.CurrentCulture)
+								   DateTime.Today.AddMonths(-1).ToString(CultureInfo.CurrentCulture)
 					),
 					DateTime.Parse(config.Settings.ToDate ??
-					               DateTime.Today.ToString(CultureInfo.CurrentCulture)
+								   DateTime.Today.ToString(CultureInfo.CurrentCulture)
 					)
 				);
 				config.TargetSites.ForEach(p => pathCount += p.LogFilePaths.Count);
@@ -118,9 +118,9 @@ public class CommandProcessor {
 
 			foreach (var site in config.TargetSites) {
 				AnsiConsole.MarkupLine($"[[DEBUG]] Processing {site.SiteName}...");
-				if ( config.OutputMode != OutputMode.LocalDb ) {
+				if (config.OutputMode != OutputMode.LocalDb) {
 					site.ParseAllLogs(); //TODO: Update to implement as a dependent process of the output mode and size/number of logs for a given site
-					if ( site.Logs.Count <= 0 ) { }
+					if (site.Logs.Count <= 0) { }
 
 					AnsiConsole.MarkupLine($"[DarkOrange]{site.SiteName}[/] has no logs from the target date range...");
 					continue;
@@ -128,46 +128,46 @@ public class CommandProcessor {
 
 				switch (config.OutputMode) {
 					case OutputMode.Local: {
-						AnsiConsole.MarkupLine($"[[DEBUG]] Output mode Local...");
-						var outFile = site.GetLogFileName(config.OutputDirectory);
-						site.Logs.TrimExcess();
-						site.Logs.WriteToFile(outFile);
-						site.Logs.Clear();
-						site.Logs.Dispose();
-						AnsiConsole.MarkupLine($"[DarkOrange]Output File :[/] {outFile}");
-						break;
-					}
-					case OutputMode.Remote: {
-						AnsiConsole.MarkupLine($"[[DEBUG]] Output mode Remote...");
-						if ( string.IsNullOrWhiteSpace(config.OutputUri) ) {
-							throw new UriNotSpecifiedException();
+							AnsiConsole.MarkupLine($"[[DEBUG]] Output mode Local...");
+							var outFile = site.GetLogFileName(config.OutputDirectory);
+							site.Logs.TrimExcess();
+							site.Logs.WriteToFile(outFile);
+							site.Logs.Clear();
+							site.Logs.Dispose();
+							AnsiConsole.MarkupLine($"[DarkOrange]Output File :[/] {outFile}");
+							break;
 						}
-
-						if ( config.OutputUri != null ) {
-							ConnectionManager connectionManager = new();
-							connectionManager.SetConnection(config.OutputUri);
-							if ( config.AuthMode == AuthMode.BearerToken ) {
-								if ( config.AuthToken != null ) connectionManager.BearerToken = config.AuthToken;
-								connectionManager.SetConnection(
-									config.OutputUri,
-									connectionManager.BearerToken ?? throw new NullAuthTokenException()
-								);
+					case OutputMode.Remote: {
+							AnsiConsole.MarkupLine($"[[DEBUG]] Output mode Remote...");
+							if (string.IsNullOrWhiteSpace(config.OutputUri)) {
+								throw new UriNotSpecifiedException();
 							}
 
-							var response =
-								connectionManager.AddLogs(site.Logs, site.SiteUrl, site.SiteName, site.HostName);
-							// var response = connectionManager.AddLogs(site.Logs, site.SiteUrl, site.SiteName, site.HostName,
-							// 	true);
-							AnsiConsole.MarkupLine($"[DarkOrange]Server Response :[/]{response}");
-						}
+							if (config.OutputUri != null) {
+								ConnectionManager connectionManager = new();
+								connectionManager.SetConnection(config.OutputUri);
+								if (config.AuthMode == AuthMode.BearerToken) {
+									if (config.AuthToken != null) connectionManager.BearerToken = config.AuthToken;
+									connectionManager.SetConnection(
+										config.OutputUri,
+										connectionManager.BearerToken ?? throw new NullAuthTokenException()
+									);
+								}
 
-						if ( config.OutputUri == null ) {
-							throw new WarningException("OutputUri was not specified.");
-						}
+								var response =
+									connectionManager.AddLogs(site.Logs, site.SiteUrl, site.SiteName, site.HostName);
+								// var response = connectionManager.AddLogs(site.Logs, site.SiteUrl, site.SiteName, site.HostName,
+								// 	true);
+								AnsiConsole.MarkupLine($"[DarkOrange]Server Response :[/]{response}");
+							}
 
-						//TODO: Process Logs for remote output
-						break;
-					}
+							if (config.OutputUri == null) {
+								throw new WarningException("OutputUri was not specified.");
+							}
+
+							//TODO: Process Logs for remote output
+							break;
+						}
 					case OutputMode.LocalDb:
 						var refConfig = config;
 						var iisLogManagerContext = new IISLogManagerContext(
@@ -221,7 +221,7 @@ public class CommandProcessor {
 											$"[DarkOrange]File Size[/] : {fileSizeMegs.ToString("F")} MB / {totalFileSize.ToString("F")} MB | [DarkOrange]File:[/] {processed}/{fileCount} ";
 										ctx.Refresh();
 										await site.ParseLogsAsync(p, new CancellationToken());
-										if ( site.ConcurrentLogs != null ) {
+										if (site.ConcurrentLogs != null) {
 											ParallelOptions guidParallelOptions = new() {
 												MaxDegreeOfParallelism = 12,
 												CancellationToken = new CancellationToken()
@@ -230,7 +230,7 @@ public class CommandProcessor {
 											var newTask = new ValueTask();
 											await Parallel.ForEachAsync(site.ConcurrentLogs, guidParallelOptions,
 												(l, guidCancellationToken) => {
-													if ( site.ConcurrentLogs.Any(o => o.UniqueId == l.UniqueId) )
+													if (site.ConcurrentLogs.Any(o => o.UniqueId == l.UniqueId))
 														l.UniqueId = Guid.NewGuid().ToString();
 													return ValueTask.CompletedTask;
 												});
@@ -292,22 +292,22 @@ public class CommandProcessor {
 	public static CommandProcessor Instance = new();
 
 	private void FilterLogs(ref CommandConfiguration config) {
-		if ( config.Settings is {Filter: true} ) {
+		if (config.Settings is { Filter: true }) {
 			int pathCount = 0;
 #if DEBUG
-				config.TargetSites.ForEach(p => pathCount += p.LogFilePaths.Count);
-				AnsiConsole.MarkupLine($"[[DEBUG]] Filtering enabled...");
-				AnsiConsole.MarkupLine($"[[DEBUG]] FromDate : {config.Settings.FromDate} ...");
-				AnsiConsole.MarkupLine($"[[DEBUG]] ToDate : {config.Settings.ToDate} ...");
-				AnsiConsole.MarkupLine($"[[DEBUG]] Filtering Files... ( Count : {pathCount})");
-				pathCount = 0;
+			config.TargetSites.ForEach(p => pathCount += p.LogFilePaths.Count);
+			AnsiConsole.MarkupLine($"[[DEBUG]] Filtering enabled...");
+			AnsiConsole.MarkupLine($"[[DEBUG]] FromDate : {config.Settings.FromDate} ...");
+			AnsiConsole.MarkupLine($"[[DEBUG]] ToDate : {config.Settings.ToDate} ...");
+			AnsiConsole.MarkupLine($"[[DEBUG]] Filtering Files... ( Count : {pathCount})");
+			pathCount = 0;
 #endif
 			config.TargetSites.FilterAllLogFiles(
 				DateTime.Parse(config.Settings.FromDate ??
-				               DateTime.Today.AddMonths(-1).ToString(CultureInfo.CurrentCulture)
+							   DateTime.Today.AddMonths(-1).ToString(CultureInfo.CurrentCulture)
 				),
 				DateTime.Parse(config.Settings.ToDate ??
-				               DateTime.Today.ToString(CultureInfo.CurrentCulture)
+							   DateTime.Today.ToString(CultureInfo.CurrentCulture)
 				)
 			);
 			config.TargetSites.ForEach(p => pathCount += p.LogFilePaths.Count);
@@ -320,43 +320,43 @@ public class CommandProcessor {
 		var site = siteReference;
 		switch (config.OutputMode) {
 			case OutputMode.Local: {
-				AnsiConsole.MarkupLine($"[[DEBUG]] Output mode Local...");
-				var outFile = site.GetLogFileName(config.OutputDirectory);
-				site.Logs.TrimExcess();
-				site.Logs.WriteToFile(outFile);
-				site.Logs.Clear();
-				site.Logs.Dispose();
-				AnsiConsole.MarkupLine($"[DarkOrange]Output File :[/] {outFile}");
-				break;
-			}
-			case OutputMode.Remote: {
-				AnsiConsole.MarkupLine($"[[DEBUG]] Output mode Remote...");
-				if ( string.IsNullOrWhiteSpace(config.OutputUri) ) {
-					throw new UriNotSpecifiedException();
+					AnsiConsole.MarkupLine($"[[DEBUG]] Output mode Local...");
+					var outFile = site.GetLogFileName(config.OutputDirectory);
+					site.Logs.TrimExcess();
+					site.Logs.WriteToFile(outFile);
+					site.Logs.Clear();
+					site.Logs.Dispose();
+					AnsiConsole.MarkupLine($"[DarkOrange]Output File :[/] {outFile}");
+					break;
 				}
-
-				if ( config.OutputUri != null ) {
-					ConnectionManager connectionManager = new();
-					connectionManager.SetConnection(config.OutputUri);
-					if ( config.AuthMode == AuthMode.BearerToken ) {
-						if ( config.AuthToken != null ) connectionManager.BearerToken = config.AuthToken;
-						connectionManager.SetConnection(
-							config.OutputUri,
-							connectionManager.BearerToken ?? throw new NullAuthTokenException()
-						);
+			case OutputMode.Remote: {
+					AnsiConsole.MarkupLine($"[[DEBUG]] Output mode Remote...");
+					if (string.IsNullOrWhiteSpace(config.OutputUri)) {
+						throw new UriNotSpecifiedException();
 					}
 
-					var response =
-						connectionManager.AddLogs(site.Logs, site.SiteUrl, site.SiteName, site.HostName);
-					AnsiConsole.MarkupLine($"[DarkOrange]Server Response :[/]{response}");
-				}
+					if (config.OutputUri != null) {
+						ConnectionManager connectionManager = new();
+						connectionManager.SetConnection(config.OutputUri);
+						if (config.AuthMode == AuthMode.BearerToken) {
+							if (config.AuthToken != null) connectionManager.BearerToken = config.AuthToken;
+							connectionManager.SetConnection(
+								config.OutputUri,
+								connectionManager.BearerToken ?? throw new NullAuthTokenException()
+							);
+						}
 
-				if ( config.OutputUri == null ) {
-					throw new WarningException("OutputUri was not specified.");
-				}
+						var response =
+							connectionManager.AddLogs(site.Logs, site.SiteUrl, site.SiteName, site.HostName);
+						AnsiConsole.MarkupLine($"[DarkOrange]Server Response :[/]{response}");
+					}
 
-				break;
-			}
+					if (config.OutputUri == null) {
+						throw new WarningException("OutputUri was not specified.");
+					}
+
+					break;
+				}
 			case OutputMode.LocalDb:
 				ProcessLocalDbSite(config, ref site);
 				break;
@@ -403,13 +403,13 @@ public class CommandProcessor {
 					.MaxValue(fileCount);
 				parseLogsTask.StartTask();
 				site.LogFilePaths.ForEach(p => {
-					var totalLines = (int) Utils.CountLines(p);
+					var totalLines = (int)Utils.CountLines(p);
 					var headerLine = Utils.GetHeaderLine(p); //TODO: Add headerLine to Parse calls
 					var maxProcessCount = 250000;
 					//TODO: We should add functionality to determine what an appropriate number of logs per available RAM is
 					var fileInfo = (new FileInfo(p));
 					var fileSizeMegs = (fileInfo.Length / 1024f / 1024f);
-					if ( totalLines > maxProcessCount ) {
+					if (totalLines > maxProcessCount) {
 						int processedCount = 0;
 						parseLogsTask.Description =
 							$"[DarkOrange]{Path.GetFileName(p)}[/] ({processedCount}/{totalLines}) | [DarkOrange]File Size[/] : {fileSizeMegs.ToString("F")} MB / {totalFileSize.ToString("F")} MB | [DarkOrange]File:[/] {processed}/{fileCount} ";
@@ -419,7 +419,7 @@ public class CommandProcessor {
 							var startLine = processedCount;
 							int processCount = processMax ? maxProcessCount : remaining;
 							site.ParseLogs(p, startLine, processCount, headerLine);
-							if ( site.Logs != null ) {
+							if (site.Logs != null) {
 								iisLogManagerContext.AddRange(site.Logs);
 								iisLogManagerContext.SaveChanges();
 								site.Logs.Clear();
@@ -432,7 +432,7 @@ public class CommandProcessor {
 						parseLogsTask.Description =
 							$"[DarkOrange]{Path.GetFileName(p)}[/] | [DarkOrange]File Size[/] : {fileSizeMegs.ToString("F")} MB / {totalFileSize.ToString("F")} MB | [DarkOrange]File:[/] {processed}/{fileCount} ";
 						site.ParseLogs(p);
-						if ( site.Logs != null ) {
+						if (site.Logs != null) {
 							iisLogManagerContext.AddRange(site.Logs);
 							iisLogManagerContext.SaveChanges();
 							site.Logs.Clear();
