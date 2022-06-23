@@ -36,10 +36,10 @@
         <PackageReference Include="Microsoft.Web.Administration" Version="11.1.0">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Newtonsoft.Json" Version="12.0.1">
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.0"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
         <PackageReference Include="Sharprompt" Version="2.4.0"/>
         <PackageReference Include="Spectre.Console" Version="0.43.1-preview.0.24"/>
