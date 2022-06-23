@@ -29,10 +29,10 @@
         <!-- 
             The various NewtonSoft Packages are here because without specifying each of them the package fails to work properly on certain older systems 
         -->
-        <PackageReference Include="Newtonsoft.Json" Version="12.0.1">
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.0"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
         <PackageReference Include="Microsoft.Web.Administration" Version="11.1.0">
             <PrivateAssets>all</PrivateAssets>
